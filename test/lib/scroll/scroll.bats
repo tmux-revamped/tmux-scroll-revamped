@@ -30,3 +30,12 @@ teardown() {
   run scroll_is_passthrough "ssh" "vim less man"
   [ "${status}" -eq 1 ]
 }
+
+@test "scroll_valid_speed accepts positive integers only" {
+  [[ "$(scroll_valid_speed 3)" == "3" ]]
+  [[ "$(scroll_valid_speed 12)" == "12" ]]
+  [[ -z "$(scroll_valid_speed 0)" ]]
+  [[ -z "$(scroll_valid_speed -2)" ]]
+  [[ -z "$(scroll_valid_speed abc)" ]]
+  [[ -z "$(scroll_valid_speed "")" ]]
+}

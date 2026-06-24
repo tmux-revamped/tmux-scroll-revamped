@@ -34,3 +34,14 @@ else
 fi
 
 tmux bind-key -n WheelDownPane send-keys -M
+
+# Optional throttle: cap copy-mode wheel scrolling to a fixed number of lines per
+# tick so a fast trackpad flick no longer jumps whole pages. send-keys -X -N is
+# available from tmux 2.4. Unset or non-numeric leaves tmux's default behavior.
+speed="$("${SCROLL_CMD}" speed)"
+if [[ -n "${speed}" ]] && ge "${ver}" "2.4"; then
+  for table in copy-mode copy-mode-vi; do
+    tmux bind-key -T "${table}" WheelUpPane send-keys -X -N "${speed}" scroll-up
+    tmux bind-key -T "${table}" WheelDownPane send-keys -X -N "${speed}" scroll-down
+  done
+fi

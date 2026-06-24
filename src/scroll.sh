@@ -25,6 +25,7 @@ main() {
   case "${1:-}" in
     pattern) scroll_build_pattern "$(scroll_apps)" ;;
     check)   scroll_is_passthrough "${2:-}" "$(scroll_apps)" ;;
+    speed)   scroll_valid_speed "$(get_tmux_option "@scroll_revamped_speed" "")" ;;
     *)       return 0 ;;
   esac
 }

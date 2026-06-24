@@ -45,6 +45,7 @@ Press `prefix + I`. Mouse mode is enabled automatically unless you opt out.
 |--------|---------|---------|
 | `@scroll_revamped_passthrough_apps` | a long default list (vim, nvim, less, man, htop, fzf, lazygit, ...) | programs that receive the wheel directly |
 | `@scroll_revamped_mouse` | `on` | set to `off` to manage `mouse` yourself |
+| `@scroll_revamped_speed` | unset | a positive integer caps copy-mode wheel scrolling to that many lines per tick, taming fast trackpad flicks; unset keeps tmux's default |
 
 To add an app, set the full list including the defaults you want to keep:
 

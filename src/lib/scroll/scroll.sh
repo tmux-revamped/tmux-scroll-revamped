@@ -31,5 +31,13 @@ scroll_is_passthrough() {
   return 1
 }
 
+# scroll_valid_speed VALUE -> VALUE when it is a positive integer, else empty. A
+# set speed throttles copy-mode wheel scrolling to that many lines per tick, so
+# fast trackpad flicks no longer jump pages at a time.
+scroll_valid_speed() {
+  [[ "${1}" =~ ^[1-9][0-9]*$ ]] && printf '%s' "${1}"
+}
+
 export -f scroll_build_pattern
 export -f scroll_is_passthrough
+export -f scroll_valid_speed

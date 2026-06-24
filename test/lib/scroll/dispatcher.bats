@@ -38,6 +38,17 @@ teardown() {
   [ "${status}" -eq 1 ]
 }
 
+@test "scroll.sh - speed echoes a configured throttle" {
+  run main speed
+  [[ -z "${output}" ]]
+  set_tmux_option "@scroll_revamped_speed" "5"
+  run main speed
+  [[ "${output}" == "5" ]]
+  set_tmux_option "@scroll_revamped_speed" "junk"
+  run main speed
+  [[ -z "${output}" ]]
+}
+
 @test "scroll.sh - unknown subcommand produces no output" {
   run main bogus
   [[ -z "${output}" ]]
