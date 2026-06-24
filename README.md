@@ -4,7 +4,7 @@
 
 **Mouse wheel that does the right thing: scroll vim and less directly, copy-mode everywhere else.**
 
-[![Tests](https://github.com/gufranco/tmux-scroll-revamped/actions/workflows/tests.yml/badge.svg)](https://github.com/gufranco/tmux-scroll-revamped/actions/workflows/tests.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](CHANGELOG.md)
+[![Tests](https://github.com/tmux-revamped/tmux-scroll-revamped/actions/workflows/tests.yml/badge.svg)](https://github.com/tmux-revamped/tmux-scroll-revamped/actions/workflows/tests.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](CHANGELOG.md)
 
 </div>
 
@@ -12,7 +12,7 @@
 
 Makes the mouse wheel behave. When the foreground program scrolls itself, vim, less, man, htop, the wheel goes straight to it. Everywhere else, the wheel enters copy-mode and scrolls the scrollback. On tmux 3.1+ the decision is a **native regex match** over `#{pane_current_command}`, so unlike mighty-scroll there is no process-tree walk and no shell forked on every wheel tick.
 
-Built from [tmux-plugin-template](https://github.com/gufranco/tmux-plugin-template).
+Built from [tmux-plugin-template](https://github.com/tmux-revamped/tmux-plugin-template).
 
 <table>
 <tr>
@@ -34,7 +34,7 @@ Install it and scroll. Over vim, less, htop, and friends the wheel scrolls the a
 With [TPM](https://github.com/tmux-plugins/tpm), add to `~/.tmux.conf`:
 
 ```tmux
-set -g @plugin 'gufranco/tmux-scroll-revamped'
+set -g @plugin 'tmux-revamped/tmux-scroll-revamped'
 ```
 
 Press `prefix + I`. Mouse mode is enabled automatically unless you opt out.
