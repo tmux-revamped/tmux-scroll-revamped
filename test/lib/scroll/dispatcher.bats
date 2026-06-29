@@ -13,35 +13,22 @@ teardown() {
 }
 
 @test "scroll.sh - functions are defined" {
-  function_exists scroll_build_pattern
-  function_exists scroll_apps
+  function_exists scroll_is_passthrough
+  function_exists scroll_valid_speed
 }
 
-@test "scroll.sh - pattern emits a regex including the default apps" {
-  run main pattern
-  [[ "${output}" == '^('*'vim'*')$' ]]
-  [[ "${output}" == *'less'* ]]
-}
-
-@test "scroll.sh - check passes known apps and rejects others" {
-  run main check vim
+@test "scroll.sh - check passes an alternate-screen pane" {
+  run main check 1 0
   [ "${status}" -eq 0 ]
-  run main check ssh
-  [ "${status}" -eq 1 ]
 }
 
-@test "scroll.sh - the passthrough list is configurable" {
-  set_tmux_option "@scroll_revamped_passthrough_apps" "foo bar"
-  run main check foo
+@test "scroll.sh - check passes a pane with mouse reporting on" {
+  run main check 0 1
   [ "${status}" -eq 0 ]
-  run main check vim
-  [ "${status}" -eq 1 ]
 }
 
-@test "scroll.sh - check passes through an alternate-screen app off the list" {
-  run main check claude 1
-  [ "${status}" -eq 0 ]
-  run main check claude 0
+@test "scroll.sh - check enters copy-mode when neither flag is set" {
+  run main check 0 0
   [ "${status}" -eq 1 ]
 }
 

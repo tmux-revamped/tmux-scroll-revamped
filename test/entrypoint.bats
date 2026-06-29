@@ -30,11 +30,29 @@ tmux_ge() {
   [[ "${output}" == *"alternate_on"* ]]
 }
 
-@test "entrypoint - passthrough_alternate off routes purely by app list" {
+@test "entrypoint - passthrough_alternate off drops the alternate-screen term" {
   tmux_ge "3.1" || skip "native routing needs tmux 3.1+"
   tmux set-option -g @scroll_revamped_passthrough_alternate off
   tmux run-shell "${PLUGIN_DIR}/scroll-revamped.tmux"
   run wheel_binding
   [ "${status}" -eq 0 ]
   [[ "${output}" != *"alternate_on"* ]]
+  [[ "${output}" == *"mouse_any_flag"* ]]
+}
+
+@test "entrypoint - apps with mouse reporting get the wheel by default" {
+  tmux_ge "3.1" || skip "native routing needs tmux 3.1+"
+  tmux run-shell "${PLUGIN_DIR}/scroll-revamped.tmux"
+  run wheel_binding
+  [ "${status}" -eq 0 ]
+  [[ "${output}" == *"mouse_any_flag"* ]]
+}
+
+@test "entrypoint - passthrough_mouse off drops the mouse-flag term" {
+  tmux_ge "3.1" || skip "native routing needs tmux 3.1+"
+  tmux set-option -g @scroll_revamped_passthrough_mouse off
+  tmux run-shell "${PLUGIN_DIR}/scroll-revamped.tmux"
+  run wheel_binding
+  [ "${status}" -eq 0 ]
+  [[ "${output}" != *"mouse_any_flag"* ]]
 }

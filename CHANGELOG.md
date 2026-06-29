@@ -5,6 +5,33 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-06-29
+
+### Added
+
+- `@scroll_revamped_passthrough_mouse` (default `on`) passes the wheel to any pane
+  whose foreground app has turned on mouse reporting, so a TUI that requests the
+  mouse scrolls itself without being named. The routing keys on `#{mouse_any_flag}`,
+  which exists on every tmux TPM supports. Set it `off` to ignore the app's mouse
+  mode.
+
+### Removed
+
+- **Breaking:** `@scroll_revamped_passthrough_apps` and the app-name list it fed.
+  `send-keys -M` only reaches an app that has turned on mouse reporting, and that
+  app is already detected by `#{mouse_any_flag}`; a full-screen app is detected by
+  `#{alternate_on}`. The name list therefore added no behavior the two formats did
+  not already cover, while forcing passthrough to a named app even when it had mouse
+  mode off. Detection is now purely name-free. Anyone who set the option should
+  remove it; the apps it listed are detected automatically.
+
+### Changed
+
+- The fast tmux 3.1+ binding no longer builds or matches a regex over
+  `#{pane_current_command}`. It is a plain `#{||:}` of `#{alternate_on}` and
+  `#{mouse_any_flag}`, so there is one fewer subshell at plugin load and a smaller
+  binding.
+
 ## [1.2.0] - 2026-06-29
 
 ### Added

@@ -2,35 +2,25 @@
 #
 # scroll.sh: pure helpers for tmux-scroll-revamped.
 #
-# A pane's foreground command decides how the wheel behaves: pass it straight to
-# full-screen apps that scroll themselves (vim, less, htop), otherwise enter
-# copy-mode. Both the regex used by the fast tmux-native binding and the
-# membership check used by the older-tmux fallback are pure and fixture-tested.
+# How the wheel behaves is decided by two tmux formats, read without naming any
+# app: a pane on the alternate screen is a full-screen app that owns the wheel, and
+# a pane whose foreground app turned on mouse reporting wants the wheel itself.
+# Otherwise the wheel enters copy-mode. The fallback predicate is pure and tested.
 
 [[ -n "${_SCROLL_REVAMPED_LOADED:-}" ]] && return 0
 _SCROLL_REVAMPED_LOADED=1
 
-# scroll_build_pattern APPS -> an anchored extended-regex alternation of the
-# space or comma separated APPS, for use in a tmux #{m/r:...} match. Empty input
-# yields a pattern that matches nothing.
-scroll_build_pattern() {
-  local alt
-  alt="$(printf '%s' "${1}" | tr ',[:space:]' '\n' | awk 'NF && !seen[$0]++{a=a (a?"|":"") $0} END{print a}')"
-  [[ -z "${alt}" ]] && { printf '%s' '$^'; return 0; }
-  printf '^(%s)$' "${alt}"
-}
-
-# scroll_is_passthrough APP APPS [ALTERNATE] -> exit 0 when the foreground app
-# should receive the wheel directly, else exit 1. Passes through when ALTERNATE
-# is "1" (the pane is on the alternate screen, so a full-screen app owns the
-# wheel) or when APP is one of the space or comma separated APPS. Used by the
-# fallback binding on tmux without regex match support.
+# scroll_is_passthrough ALTERNATE MOUSE -> exit 0 when the foreground app should
+# receive the wheel directly, else exit 1. Passes through when ALTERNATE is "1"
+# (the pane is on the alternate screen, so a full-screen app owns the wheel) or
+# when MOUSE is "1" (the app has turned on mouse reporting, so it wants the wheel
+# itself). Both come straight from tmux formats, so a full-screen or mouse-aware
+# app is detected without ever being named. Used by the fallback binding on tmux
+# without #{||:} support.
 scroll_is_passthrough() {
-  local app="${1}" apps="${2}" alternate="${3:-}" a
+  local alternate="${1:-}" mouse="${2:-}"
   [[ "${alternate}" == "1" ]] && return 0
-  while IFS= read -r a; do
-    [[ -n "${a}" && "${a}" == "${app}" ]] && return 0
-  done <<< "$(printf '%s' "${apps}" | tr ',[:space:]' '\n')"
+  [[ "${mouse}" == "1" ]] && return 0
   return 1
 }
 
@@ -41,6 +31,5 @@ scroll_valid_speed() {
   [[ "${1}" =~ ^[1-9][0-9]*$ ]] && printf '%s' "${1}"
 }
 
-export -f scroll_build_pattern
 export -f scroll_is_passthrough
 export -f scroll_valid_speed

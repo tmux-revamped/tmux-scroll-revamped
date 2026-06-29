@@ -2,12 +2,13 @@
 #
 # scroll-revamped.tmux: TPM entry point.
 #
-# Binds the mouse wheel so full-screen apps (vim, less, htop) get the wheel
-# directly while everything else enters copy-mode. A pane on the alternate screen
-# is a full-screen app by definition, so by default it gets the wheel even when
-# its command is not in the passthrough list. On tmux 3.1+ the routing is a
-# native format match over #{alternate_on} and #{pane_current_command}, so there
-# is no per-event fork; older tmux falls back to a check command.
+# Binds the mouse wheel so a full-screen app (vim, less, htop) or any app that has
+# turned on mouse reporting gets the wheel directly, while everything else enters
+# copy-mode. A pane on the alternate screen is a full-screen app by definition, and
+# a pane whose app requested the mouse wants the wheel itself, so both are detected
+# without naming any app. On tmux 3.1+ the routing is a native format match over
+# #{alternate_on} and #{mouse_any_flag}, so there is no per-event fork; older tmux
+# falls back to a check command.
 
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCROLL_CMD="${CURRENT_DIR}/src/scroll.sh"
@@ -31,16 +32,24 @@ ge() { [[ "$(printf '%s\n%s\n' "${2}" "${1}" | sort -V | head -n1)" == "${2}" ]]
 # app, so it owns the wheel. On by default; set off to route purely by app list.
 alt_on="$(get_opt "@scroll_revamped_passthrough_alternate" "on")"
 
+# Mouse-reporting passthrough: a pane whose foreground app has turned on mouse
+# tracking wants the wheel itself, whatever its name. This is what lets an unlisted
+# TUI scroll without ever being added to the app list. On by default; set off to
+# ignore the app's mouse mode. #{mouse_any_flag} exists on every tmux TPM supports.
+mouse_on="$(get_opt "@scroll_revamped_passthrough_mouse" "on")"
+
 if ge "${ver}" "3.1"; then
-  pattern="$("${SCROLL_CMD}" pattern)"
-  match="#{m/r:${pattern},#{pane_current_command}}"
+  match="#{pane_in_mode}"
   [[ "${alt_on}" == "on" ]] && match="#{||:#{alternate_on},${match}}"
-  cond="#{?#{||:#{pane_in_mode},${match}},1,0}"
+  [[ "${mouse_on}" == "on" ]] && match="#{||:#{mouse_any_flag},${match}}"
+  cond="#{?${match},1,0}"
   tmux bind-key -n WheelUpPane if-shell -F "${cond}" "send-keys -M" "copy-mode -e; send-keys -M"
 else
   alt_flag="0"
   [[ "${alt_on}" == "on" ]] && alt_flag="#{alternate_on}"
-  tmux bind-key -n WheelUpPane if-shell "${SCROLL_CMD} check '#{pane_current_command}' '${alt_flag}'" "send-keys -M" "copy-mode -e; send-keys -M"
+  mouse_flag="0"
+  [[ "${mouse_on}" == "on" ]] && mouse_flag="#{mouse_any_flag}"
+  tmux bind-key -n WheelUpPane if-shell "${SCROLL_CMD} check '${alt_flag}' '${mouse_flag}'" "send-keys -M" "copy-mode -e; send-keys -M"
 fi
 
 tmux bind-key -n WheelDownPane send-keys -M

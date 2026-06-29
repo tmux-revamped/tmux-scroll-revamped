@@ -12,36 +12,20 @@ teardown() {
   cleanup_test_environment
 }
 
-@test "scroll_build_pattern builds an anchored alternation" {
-  [[ "$(scroll_build_pattern "vim less")" == '^(vim|less)$' ]]
-}
-
-@test "scroll_build_pattern de-duplicates and normalizes separators" {
-  [[ "$(scroll_build_pattern "vim, vim  less")" == '^(vim|less)$' ]]
-}
-
-@test "scroll_build_pattern with empty input matches nothing" {
-  [[ "$(scroll_build_pattern "")" == '$^' ]]
-}
-
-@test "scroll_is_passthrough recognizes membership" {
-  run scroll_is_passthrough "vim" "vim less man"
+@test "scroll_is_passthrough passes through an alternate-screen pane" {
+  run scroll_is_passthrough "1" "0"
   [ "${status}" -eq 0 ]
-  run scroll_is_passthrough "ssh" "vim less man"
+}
+
+@test "scroll_is_passthrough passes through a pane that requested mouse reporting" {
+  run scroll_is_passthrough "0" "1"
+  [ "${status}" -eq 0 ]
+}
+
+@test "scroll_is_passthrough enters copy-mode when neither flag is set" {
+  run scroll_is_passthrough "0" "0"
   [ "${status}" -eq 1 ]
-}
-
-@test "scroll_is_passthrough passes through any alternate-screen app" {
-  run scroll_is_passthrough "claude" "vim less man" "1"
-  [ "${status}" -eq 0 ]
-  run scroll_is_passthrough "ssh" "vim less man" "1"
-  [ "${status}" -eq 0 ]
-}
-
-@test "scroll_is_passthrough on the primary screen falls back to the app list" {
-  run scroll_is_passthrough "vim" "vim less man" "0"
-  [ "${status}" -eq 0 ]
-  run scroll_is_passthrough "claude" "vim less man" "0"
+  run scroll_is_passthrough "" ""
   [ "${status}" -eq 1 ]
 }
 
