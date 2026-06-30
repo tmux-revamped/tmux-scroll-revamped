@@ -4,11 +4,11 @@
 
 **Mouse wheel that does the right thing: scroll the app directly, copy-mode everywhere else. No app names to configure.**
 
-[![Tests](https://github.com/tmux-revamped/tmux-scroll-revamped/actions/workflows/tests.yml/badge.svg)](https://github.com/tmux-revamped/tmux-scroll-revamped/actions/workflows/tests.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](CHANGELOG.md)
+[![Tests](https://github.com/tmux-revamped/tmux-scroll-revamped/actions/workflows/tests.yml/badge.svg)](https://github.com/tmux-revamped/tmux-scroll-revamped/actions/workflows/tests.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](CHANGELOG.md)
 
 </div>
 
-**name-free routing** · **no per-event fork** · **tmux 1.9 to 3.5** · **40** tests · **95%+** coverage
+**name-free routing** · **no per-event fork** · **tmux 1.9 to 3.5** · **87** tests · **95%+** coverage
 
 Makes the mouse wheel behave, with nothing to configure. A full-screen app on the alternate screen, a TUI like Claude Code, vim, less, or htop, owns the wheel, and so does any app that has turned on mouse reporting. Everywhere else the wheel enters copy-mode and scrolls the scrollback. Detection reads two tmux formats, `#{alternate_on}` and `#{mouse_any_flag}`, so every app that can use the wheel gets it without ever being named. On tmux 3.1+ the decision is a **native format match**, so unlike mighty-scroll there is no process-tree walk and no shell forked on every wheel tick.
 
@@ -49,6 +49,14 @@ Detection works out of the box. The options below only exist to turn a heuristic
 | `@scroll_revamped_passthrough_mouse` | `on` | pass the wheel to any app that has turned on mouse reporting; set to `off` to ignore the app's mouse mode |
 | `@scroll_revamped_mouse` | `on` | set to `off` to manage `mouse` yourself |
 | `@scroll_revamped_speed` | unset | a positive integer caps copy-mode wheel scrolling to that many lines per tick, taming fast trackpad flicks; unset keeps tmux's default |
+| `@scroll_revamped_select_pane` | `off` | set to `on` to focus the pane under the wheel before scrolling |
+| `@scroll_revamped_skip_empty` | `off` | set to `on` to keep the wheel out of copy-mode on a pane with no scrollback |
+| `@scroll_revamped_alt_keys` | unset | `arrow` or `page` translates the wheel into arrow or page keys for an alternate-screen app with mouse reporting off (less, man, vi), so the wheel finally scrolls it; arrow mode uses `@scroll_revamped_speed` as the count |
+| `@scroll_revamped_status_wheel` | `off` | set to `on` to switch windows when the wheel rolls over the status line |
+| `@scroll_revamped_granularity` | `line` | how far one copy-mode wheel tick scrolls: `line`, `halfpage`, or `page` |
+| `@scroll_revamped_auto_exit` | `off` | set to `on` to leave copy-mode when a downward tick is already at the bottom |
+| `@scroll_revamped_indicator` | `off` | set to `on` to flash the copy-mode scroll position on each tick (tmux 2.9+) |
+| `@scroll_revamped_drag_copy` | `off` | set to `on` to copy a mouse drag-selection to the system clipboard (pbcopy, wl-copy, xclip, or xsel) |
 
 With both heuristics off the wheel only ever drives copy-mode, since nothing is left to detect a self-scrolling app by.
 
@@ -64,7 +72,7 @@ make lint    # shellcheck
 make coverage  # kcov line coverage on Linux
 ```
 
-The passthrough predicate lives in [`src/lib/scroll/scroll.sh`](src/lib/scroll/scroll.sh) as a pure function, fixture-tested, while the wheel bindings are wired in [`scroll-revamped.tmux`](scroll-revamped.tmux).
+The passthrough predicates live in [`src/lib/scroll/scroll.sh`](src/lib/scroll/scroll.sh) as pure functions, fixture-tested. The wheel bindings are built in [`src/lib/scroll/routing.sh`](src/lib/scroll/routing.sh) behind a single applier seam, so every routing branch is asserted through a dry-run applier that never touches a live tmux; [`scroll-revamped.tmux`](scroll-revamped.tmux) is a thin entry point that applies them.
 
 ## License
 

@@ -5,6 +5,40 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-06-30
+
+### Added
+
+- `@scroll_revamped_select_pane` (default `off`) focuses the pane under the wheel
+  before scrolling, so a tick on an inactive pane selects it first.
+- `@scroll_revamped_skip_empty` (default `off`) keeps the wheel out of copy-mode on
+  a pane with no scrollback by folding `#{history_size}` into the passthrough match.
+- `@scroll_revamped_alt_keys` (`arrow` or `page`, default unset) translates the
+  wheel into arrow or page keys for an alternate-screen app that has not turned on
+  mouse reporting, so less, man, and vi with the mouse off finally scroll. Arrow
+  mode honors `@scroll_revamped_speed` as the lines-per-tick count.
+- `@scroll_revamped_status_wheel` (default `off`) switches windows when the wheel
+  rolls over the status line.
+- `@scroll_revamped_granularity` (`line`, `halfpage`, or `page`, default `line`)
+  sets how far one wheel tick scrolls in copy-mode.
+- `@scroll_revamped_auto_exit` (default `off`) leaves copy-mode automatically when a
+  downward tick is already at the bottom of the scrollback.
+- `@scroll_revamped_indicator` (default `off`, tmux 2.9+) flashes the copy-mode
+  scroll position as `#{scroll_position}/#{history_size}` on each tick.
+- `@scroll_revamped_drag_copy` (default `off`) copies a mouse drag-selection to the
+  system clipboard via `pbcopy`, `wl-copy`, `xclip`, or `xsel`, restoring the
+  selection that enabling `mouse` otherwise takes over.
+
+### Changed
+
+- tmux 2.0 through 3.0 now route the wheel with a fork-free `if-shell -F` over a
+  nested `#{?}` condition instead of forking a check command on every event. tmux
+  3.1+ keeps the native `#{||:}` match. Only tmux 1.9 still forks, and that decision
+  is now cached per pane so an unchanged pane skips recomputation.
+- Routing logic moved into `src/lib/scroll/routing.sh` behind a single applier seam,
+  so the full binding set is unit tested through a dry-run applier that never touches
+  a live tmux.
+
 ## [2.0.0] - 2026-06-29
 
 ### Added

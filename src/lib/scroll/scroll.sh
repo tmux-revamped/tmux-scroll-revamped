@@ -2,10 +2,12 @@
 #
 # scroll.sh: pure helpers for tmux-scroll-revamped.
 #
-# How the wheel behaves is decided by two tmux formats, read without naming any
-# app: a pane on the alternate screen is a full-screen app that owns the wheel, and
-# a pane whose foreground app turned on mouse reporting wants the wheel itself.
-# Otherwise the wheel enters copy-mode. The fallback predicate is pure and tested.
+# How the wheel behaves is decided by tmux formats, read without naming any app: a
+# pane on the alternate screen is a full-screen app that owns the wheel, and a pane
+# whose foreground app turned on mouse reporting wants the wheel itself. A pane with
+# no scrollback has nothing to copy-mode into. Otherwise the wheel enters copy-mode.
+# These predicates are pure and fixture-tested; the bindings that use them live in
+# routing.sh.
 
 [[ -n "${_SCROLL_REVAMPED_LOADED:-}" ]] && return 0
 _SCROLL_REVAMPED_LOADED=1
@@ -16,12 +18,32 @@ _SCROLL_REVAMPED_LOADED=1
 # when MOUSE is "1" (the app has turned on mouse reporting, so it wants the wheel
 # itself). Both come straight from tmux formats, so a full-screen or mouse-aware
 # app is detected without ever being named. Used by the fallback binding on tmux
-# without #{||:} support.
+# without native format operators.
 scroll_is_passthrough() {
   local alternate="${1:-}" mouse="${2:-}"
   [[ "${alternate}" == "1" ]] && return 0
   [[ "${mouse}" == "1" ]] && return 0
   return 1
+}
+
+# scroll_decide ALTERNATE MOUSE SKIPHIST -> exit 0 when the wheel should pass
+# through (alternate screen, mouse reporting, or an empty scrollback when the skip
+# heuristic is active), else exit 1 to enter copy-mode. SKIPHIST is "#{history_size}"
+# only when the skip-empty heuristic is on, so the literal "0" forces passthrough;
+# any other value, including the empty string passed when the heuristic is off,
+# leaves the copy-mode path intact.
+scroll_decide() {
+  scroll_is_passthrough "${1:-}" "${2:-}" && return 0
+  [[ "${3:-}" == "0" ]] && return 0
+  return 1
+}
+
+# scroll_cache_key ALTERNATE MOUSE SKIPHIST PANE -> a stable string identifying a
+# routing decision. The pre-native fallback stores the last key and its decision in
+# a tmux option, so an unchanged pane skips recomputing the predicate on every
+# wheel tick.
+scroll_cache_key() {
+  printf '%s|%s|%s|%s' "${4:-}" "${1:-}" "${2:-}" "${3:-}"
 }
 
 # scroll_valid_speed VALUE -> VALUE when it is a positive integer, else empty. A
@@ -32,4 +54,6 @@ scroll_valid_speed() {
 }
 
 export -f scroll_is_passthrough
+export -f scroll_decide
+export -f scroll_cache_key
 export -f scroll_valid_speed
