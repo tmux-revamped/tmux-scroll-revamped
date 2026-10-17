@@ -4,18 +4,18 @@
 
 <strong>将鼠标滚轮交给能自行滚动的应用，其他情况下进入 tmux 复制模式。</strong>
 
-[English](README.md) &nbsp;|&nbsp; [日本語](README.ja.md) &nbsp;|&nbsp; 简体中文 &nbsp;|&nbsp; [繁體中文（香港）](README.zh-HK.md)
+[English](README.md) | [日本語](README.ja.md) | 简体中文 | [繁體中文（香港）](README.zh-HK.md)
 
 [![Tests](https://github.com/tmux-revamped/tmux-scroll-revamped/actions/workflows/tests.yml/badge.svg)](https://github.com/tmux-revamped/tmux-scroll-revamped/actions/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](CHANGELOG.md)
 
 <p align="center">
-  <a href="#what-it-does">功能</a> &nbsp;|&nbsp;
-  <a href="#installation">安装</a> &nbsp;|&nbsp;
-  <a href="#usage">用法</a> &nbsp;|&nbsp;
-  <a href="#configuration">配置</a> &nbsp;|&nbsp;
-  <a href="#key-bindings">按键绑定</a> &nbsp;|&nbsp;
+  <a href="#what-it-does">功能</a> |
+  <a href="#installation">安装</a> |
+  <a href="#usage">用法</a> |
+  <a href="#configuration">配置</a> |
+  <a href="#key-bindings">按键绑定</a> |
   <a href="#how-it-works">工作原理</a>
 </p>
 
