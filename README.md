@@ -8,7 +8,7 @@
 
 </div>
 
-**name-free routing** · **no per-event fork** · **tmux 1.9 to 3.5** · **87** tests · **95%+** coverage
+**name-free routing** · **no per-event fork** · **tmux 1.9 to 3.5** · **95%+** coverage
 
 Makes the mouse wheel behave, with nothing to configure. A full-screen app on the alternate screen, a TUI like Claude Code, vim, less, or htop, owns the wheel, and so does any app that has turned on mouse reporting. Everywhere else the wheel enters copy-mode and scrolls the scrollback. Detection reads two tmux formats, `#{alternate_on}` and `#{mouse_any_flag}`, so every app that can use the wheel gets it without ever being named. On tmux 3.1+ the decision is a **native format match**, so unlike mighty-scroll there is no process-tree walk and no shell forked on every wheel tick.
 
