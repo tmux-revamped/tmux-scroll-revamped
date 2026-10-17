@@ -53,19 +53,15 @@ teardown() {
 @test "platform.sh - is_macos is true on Darwin" {
   _PLATFORM_OS_CACHE="Darwin"
   is_macos
-  run is_linux
-  [ "${status}" -eq 1 ]
-  run is_bsd
-  [ "${status}" -eq 1 ]
+  ! is_linux || false
+  ! is_bsd
 }
 
 @test "platform.sh - is_linux is true on Linux" {
   _PLATFORM_OS_CACHE="Linux"
   is_linux
-  run is_macos
-  [ "${status}" -eq 1 ]
-  run is_bsd
-  [ "${status}" -eq 1 ]
+  ! is_macos || false
+  ! is_bsd
 }
 
 @test "platform.sh - is_bsd is true on FreeBSD" {
