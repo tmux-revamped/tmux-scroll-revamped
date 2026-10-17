@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The tmux 1.9 fallback wheel binding quotes the plugin path, so a checkout
   under a directory with a space or a quote still runs its check command.
+- Version gates compare the major and minor numbers in bash instead of calling
+  `sort -V`, which some coreutils builds lack.
 
 ## [2.1.0] - 2026-06-30
 

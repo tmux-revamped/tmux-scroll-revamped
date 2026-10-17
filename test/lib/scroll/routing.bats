@@ -46,6 +46,20 @@ teardown() {
   [ "${status}" -eq 1 ]
 }
 
+@test "routing - scroll_ge compares numerically without sort -V" {
+  # Arrange
+  mkdir -p "${TEST_TMPDIR}/bin"
+  printf '#!/bin/sh\nexit 1\n' > "${TEST_TMPDIR}/bin/sort"
+  chmod +x "${TEST_TMPDIR}/bin/sort"
+  PATH="${TEST_TMPDIR}/bin:${PATH}"
+
+  # Act
+  run scroll_ge "3.10" "3.9"
+
+  # Assert
+  [ "${status}" -eq 0 ]
+}
+
 @test "routing - scroll_or is native on 3.1+ and nested below" {
   [[ "$(scroll_or 3.5 A B)" == "#{||:A,B}" ]]
   [[ "$(scroll_or 2.4 A B)" == "#{?A,1,B}" ]]

@@ -23,9 +23,11 @@ run_entrypoint() {
 
 # tmux_ge VER -> exit 0 when the running tmux is at least VER.
 tmux_ge() {
-  local have
-  have="$(command tmux -V | sed -E 's/^tmux ([0-9]+\.[0-9]+).*/\1/')"
-  [[ "$(printf '%s\n%s\n' "${1}" "${have}" | sort -V | head -n1)" == "${1}" ]]
+  local have have_major have_minor need_major need_minor
+  have="$(command tmux -V | sed -E 's/^tmux [^0-9]*([0-9]+\.[0-9]+).*/\1/')"
+  IFS=. read -r have_major have_minor <<<"${have}"
+  IFS=. read -r need_major need_minor <<<"${1}"
+  (( have_major > need_major || (have_major == need_major && have_minor >= need_minor) ))
 }
 
 @test "entrypoint - alternate-screen apps get the wheel by default" {

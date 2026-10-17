@@ -52,9 +52,29 @@ scroll_tmux_quoted_path() {
   printf '%s' "${word}"
 }
 
+scroll_version_part() {
+  local ver="${1}" major minor
+  ver="${ver#"${ver%%[0-9]*}"}"
+  major="${ver%%[!0-9]*}"
+  minor=""
+  [[ "${ver}" == "${major}."* ]] && minor="${ver#"${major}".}"
+  minor="${minor%%[!0-9]*}"
+  if [[ "${2}" == "major" ]]; then
+    printf '%s' "$(( 10#${major:-0} ))"
+  else
+    printf '%s' "$(( 10#${minor:-0} ))"
+  fi
+}
+
 # scroll_ge VER MIN -> exit 0 when VER is at least MIN.
 scroll_ge() {
-  [[ "$(printf '%s\n%s\n' "${2}" "${1}" | sort -V | head -n1)" == "${2}" ]]
+  local have_major have_minor need_major need_minor
+  [[ -n "${1}" ]] || return 1
+  have_major="$(scroll_version_part "${1}" major)"
+  have_minor="$(scroll_version_part "${1}" minor)"
+  need_major="$(scroll_version_part "${2}" major)"
+  need_minor="$(scroll_version_part "${2}" minor)"
+  (( have_major > need_major || (have_major == need_major && have_minor >= need_minor) ))
 }
 
 # scroll_or VER A B -> a tmux format that is true when A or B is true. Native
@@ -259,6 +279,7 @@ export -f scroll_emit
 export -f scroll_tmux_version
 export -f scroll_opt
 export -f scroll_tmux_quoted_path
+export -f scroll_version_part
 export -f scroll_ge
 export -f scroll_or
 export -f scroll_and
