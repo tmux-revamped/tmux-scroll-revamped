@@ -253,7 +253,7 @@ teardown() {
   [[ "${out}" == *"send-keys -X cancel"* ]]
 }
 
-@test "routing - indicator is shown on 2.9+ and gated below" {
+@test "routing - indicator is shown on 3.2+ and gated below" {
   set_tmux_option "@scroll_revamped_indicator" "on"
   local out_modern out_old
   out_modern="$(scroll_build_copymode 3.5)"
@@ -261,6 +261,19 @@ teardown() {
   out_old="$(scroll_build_copymode 2.4)"
   [[ "${out_old}" == *"WheelUpPane"* ]]
   [[ "${out_old}" != *"display-message"* ]]
+}
+
+@test "routing - indicator is gated on tmux 3.1 where display-message lacks -d" {
+  # Arrange
+  set_tmux_option "@scroll_revamped_indicator" "on"
+  local out
+
+  # Act
+  out="$(scroll_build_copymode 3.1)"
+
+  # Assert
+  [[ "${out}" == *"WheelUpPane"* ]] || false
+  [[ "${out}" != *"display-message"* ]]
 }
 
 @test "routing - drag_copy binds copy-pipe-and-cancel when a clipboard exists" {

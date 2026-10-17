@@ -55,7 +55,7 @@ Detection works out of the box. The options below only exist to turn a heuristic
 | `@scroll_revamped_status_wheel` | `off` | set to `on` to switch windows when the wheel rolls over the status line |
 | `@scroll_revamped_granularity` | `line` | how far one copy-mode wheel tick scrolls: `line`, `halfpage`, or `page` |
 | `@scroll_revamped_auto_exit` | `off` | set to `on` to leave copy-mode when a downward tick is already at the bottom |
-| `@scroll_revamped_indicator` | `off` | set to `on` to flash the copy-mode scroll position on each tick (tmux 2.9+) |
+| `@scroll_revamped_indicator` | `off` | set to `on` to flash the copy-mode scroll position on each tick (tmux 3.2+) |
 | `@scroll_revamped_drag_copy` | `off` | set to `on` to copy a mouse drag-selection to the system clipboard (pbcopy, wl-copy, xclip, or xsel) |
 
 With both heuristics off the wheel only ever drives copy-mode, since nothing is left to detect a self-scrolling app by.

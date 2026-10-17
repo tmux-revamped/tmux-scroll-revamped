@@ -228,7 +228,7 @@ scroll_build_copymode() {
     || [[ "${indicator}" == "on" ]]; } && need=1
 
   local show_indicator=0
-  [[ "${indicator}" == "on" ]] && scroll_ge "${ver}" "2.9" && show_indicator=1
+  [[ "${indicator}" == "on" ]] && scroll_ge "${ver}" "3.2" && show_indicator=1
 
   local clip=""
   [[ "${dragcopy}" == "on" ]] && clip="$(scroll_clipboard_command)"
