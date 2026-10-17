@@ -15,6 +15,7 @@ _SCROLL_REVAMPED_ROUTING_LOADED=1
 
 ROUTING_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 SCROLL_REVAMPED_CMD="${ROUTING_ROOT}/src/scroll.sh"
+SCROLL_REVAMPED_MAX_ALT_KEYS=20
 
 # shellcheck source=/dev/null
 source "${ROUTING_ROOT}/src/lib/tmux/tmux-ops.sh"
@@ -126,6 +127,9 @@ scroll_passthrough_action() {
     if [[ "${altkeys}" == "arrow" ]]; then
       [[ "${dir}" == "up" ]] && key="Up" || key="Down"
       reps="${count:-1}"
+      if [[ "${#reps}" -gt "${#SCROLL_REVAMPED_MAX_ALT_KEYS}" ]] || [[ "${reps}" -gt "${SCROLL_REVAMPED_MAX_ALT_KEYS}" ]]; then
+        reps="${SCROLL_REVAMPED_MAX_ALT_KEYS}"
+      fi
     else
       [[ "${dir}" == "up" ]] && key="PageUp" || key="PageDown"
     fi

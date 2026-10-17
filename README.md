@@ -51,7 +51,7 @@ Detection works out of the box. The options below only exist to turn a heuristic
 | `@scroll_revamped_speed` | unset | a positive integer caps copy-mode wheel scrolling to that many lines per tick, taming fast trackpad flicks; unset keeps tmux's default |
 | `@scroll_revamped_select_pane` | `off` | set to `on` to focus the pane under the wheel before scrolling |
 | `@scroll_revamped_skip_empty` | `off` | set to `on` to keep the wheel out of copy-mode on a pane with no scrollback |
-| `@scroll_revamped_alt_keys` | unset | `arrow` or `page` translates the wheel into arrow or page keys for an alternate-screen app with mouse reporting off (less, man, vi), so the wheel finally scrolls it; arrow mode uses `@scroll_revamped_speed` as the count |
+| `@scroll_revamped_alt_keys` | unset | `arrow` or `page` translates the wheel into arrow or page keys for an alternate-screen app with mouse reporting off (less, man, vi), so the wheel finally scrolls it; arrow mode uses `@scroll_revamped_speed` as the count, capped at 20 keys per tick |
 | `@scroll_revamped_status_wheel` | `off` | set to `on` to switch windows when the wheel rolls over the status line |
 | `@scroll_revamped_granularity` | `line` | how far one copy-mode wheel tick scrolls: `line`, `halfpage`, or `page` |
 | `@scroll_revamped_auto_exit` | `off` | set to `on` to leave copy-mode when a downward tick is already at the bottom |

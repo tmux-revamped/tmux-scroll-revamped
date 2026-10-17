@@ -119,6 +119,17 @@ teardown() {
   [[ "$(scroll_passthrough_action 3.5 arrow 2 down)" == *"send-keys Down Down"* ]]
 }
 
+@test "routing - arrow action caps the repeated keys for a huge speed" {
+  # Arrange
+  local expected="'send-keys Up Up Up Up Up Up Up Up Up Up Up Up Up Up Up Up Up Up Up Up'" action
+
+  # Act
+  action="$(scroll_passthrough_action 3.5 arrow 99999999999999999999999 up)"
+
+  # Assert
+  [[ "${action}" == *"${expected}"* ]]
+}
+
 @test "routing - page action sends a single page key" {
   [[ "$(scroll_passthrough_action 3.5 page 5 up)" == *"send-keys PageUp'"* ]]
   [[ "$(scroll_passthrough_action 3.5 page 5 down)" == *"send-keys PageDown'"* ]]

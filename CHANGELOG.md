@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `sort -V`, which some coreutils builds lack.
 - `@scroll_revamped_indicator` is applied only on tmux 3.2 and later, the first
   release whose `display-message` accepts `-d`.
+- `@scroll_revamped_alt_keys arrow` sends at most 20 arrow keys per wheel tick,
+  so a very large `@scroll_revamped_speed` no longer builds a huge binding.
 
 ## [2.1.0] - 2026-06-30
 
