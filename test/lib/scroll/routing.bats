@@ -9,8 +9,6 @@ setup() {
   unset _TMUX_PLUGIN_PLATFORM_LOADED
   unset _TMUX_PLUGIN_HAS_COMMAND_LOADED
   source "${BATS_TEST_DIRNAME}/../../../src/lib/scroll/routing.sh"
-  # Dry-run applier: record each tmux command as a bracketed line instead of
-  # touching a live tmux. This is what every binding assertion reads.
   scroll_emit() {
     local out="tmux" a
     for a in "$@"; do out="${out} [${a}]"; done

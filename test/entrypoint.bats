@@ -10,7 +10,6 @@ teardown() {
   teardown_tmux_server
 }
 
-# wheel_binding -> the generated root-table WheelUpPane binding.
 wheel_binding() {
   tmux list-keys 2>/dev/null | grep WheelUpPane | grep root
 }
@@ -21,7 +20,6 @@ run_entrypoint() {
   tmux run-shell "${quoted}"
 }
 
-# tmux_ge VER -> exit 0 when the running tmux is at least VER.
 tmux_ge() {
   local have have_major have_minor need_major need_minor
   have="$(command tmux -V | sed -E 's/^tmux [^0-9]*([0-9]+\.[0-9]+).*/\1/')"
