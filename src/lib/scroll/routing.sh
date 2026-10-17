@@ -42,6 +42,16 @@ scroll_opt() {
   get_tmux_option "@scroll_revamped_${1}" "${2}"
 }
 
+scroll_tmux_quoted_path() {
+  local word bs='\' bs2='\\' dq='"' bsdq='\"' dollar='$' bsdollar='\$' hash='#' hash2='##'
+  printf -v word '%q' "${1}"
+  word=${word//"${bs}"/"${bs2}"}
+  word=${word//"${dq}"/"${bsdq}"}
+  word=${word//"${dollar}"/"${bsdollar}"}
+  word=${word//"${hash}"/"${hash2}"}
+  printf '%s' "${word}"
+}
+
 # scroll_ge VER MIN -> exit 0 when VER is at least MIN.
 scroll_ge() {
   [[ "$(printf '%s\n%s\n' "${2}" "${1}" | sort -V | head -n1)" == "${2}" ]]
@@ -156,7 +166,7 @@ scroll_build_wheel() {
     [[ "${mouse}" == "on" ]] && mouse_flag="#{mouse_any_flag}"
     [[ "${skip}" == "on" ]] && hist="#{history_size}"
     local check up_cmd
-    check="${SCROLL_REVAMPED_CMD} check '${alt_flag}' '${mouse_flag}' '${hist}' '#{pane_id}'"
+    check="$(scroll_tmux_quoted_path "${SCROLL_REVAMPED_CMD}") check '${alt_flag}' '${mouse_flag}' '${hist}' '#{pane_id}'"
     up_cmd="$(printf 'if-shell "%s" "%s" "%s"' "${check}" "send-keys -M" "${copymode}")"
     scroll_emit bind-key -n WheelUpPane "${prefix}${up_cmd}"
     scroll_emit bind-key -n WheelDownPane "${prefix}send-keys -M"
@@ -248,6 +258,7 @@ scroll_main() {
 export -f scroll_emit
 export -f scroll_tmux_version
 export -f scroll_opt
+export -f scroll_tmux_quoted_path
 export -f scroll_ge
 export -f scroll_or
 export -f scroll_and

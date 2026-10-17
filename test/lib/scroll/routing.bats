@@ -186,6 +186,18 @@ teardown() {
   [[ "${out}" == *"history_size"* ]]
 }
 
+@test "routing - 1.9 wheel quotes a plugin path with a space and a quote" {
+  # Arrange
+  export SCROLL_REVAMPED_CMD="/opt/my plugins/it's/src/scroll.sh"
+  local out
+
+  # Act
+  out="$(scroll_build_wheel 1.9)"
+
+  # Assert
+  [[ "${out}" == *"if-shell \"/opt/my\\\\ plugins/it\\\\'s/src/scroll.sh check '"* ]]
+}
+
 @test "routing - _scroll_x_command maps granularity and direction" {
   [[ "$(_scroll_x_command "" line up)" == "send-keys -X scroll-up" ]]
   [[ "$(_scroll_x_command "" line down)" == "send-keys -X scroll-down" ]]
