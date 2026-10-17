@@ -1,95 +1,150 @@
 <div align="center">
 
-<h1>tmux-scroll-revamped</h1>
+# tmux-scroll-revamped
 
-**Mouse wheel that does the right thing: scroll the app directly, copy-mode everywhere else. No app names to configure.**
+<strong>Send the mouse wheel to apps that scroll themselves and into tmux copy-mode everywhere else.</strong>
 
-[![Tests](https://github.com/tmux-revamped/tmux-scroll-revamped/actions/workflows/tests.yml/badge.svg)](https://github.com/tmux-revamped/tmux-scroll-revamped/actions/workflows/tests.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](CHANGELOG.md)
+English &nbsp;|&nbsp; [日本語](README.ja.md) &nbsp;|&nbsp; [简体中文](README.zh-Hans.md) &nbsp;|&nbsp; [繁體中文（香港）](README.zh-HK.md)
+
+[![Tests](https://github.com/tmux-revamped/tmux-scroll-revamped/actions/workflows/tests.yml/badge.svg)](https://github.com/tmux-revamped/tmux-scroll-revamped/actions/workflows/tests.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](CHANGELOG.md)
+
+<p align="center">
+  <a href="#what-it-does">What it does</a> &nbsp;|&nbsp;
+  <a href="#installation">Installation</a> &nbsp;|&nbsp;
+  <a href="#usage">Usage</a> &nbsp;|&nbsp;
+  <a href="#configuration">Configuration</a> &nbsp;|&nbsp;
+  <a href="#key-bindings">Key bindings</a> &nbsp;|&nbsp;
+  <a href="#how-it-works">How it works</a>
+</p>
 
 </div>
 
-**name-free routing** · **no per-event fork** · **tmux 1.9 to 3.5** · **95%+** coverage
+**0 processes forked per wheel tick on tmux 2.0 and later. 0 app names to configure. 13 options. Tested on macOS and Linux.**
 
-Makes the mouse wheel behave, with one option to turn it on. A full-screen app on the alternate screen, a TUI like Claude Code, vim, less, or htop, owns the wheel, and so does any app that has turned on mouse reporting. Everywhere else the wheel enters copy-mode and scrolls the scrollback. Detection reads two tmux formats, `#{alternate_on}` and `#{mouse_any_flag}`, so every app that can use the wheel gets it without ever being named. On tmux 3.1+ the decision is a **native format match**, so unlike mighty-scroll there is no process-tree walk and no shell forked on every wheel tick.
+---
 
-Built from [tmux-plugin-template](https://github.com/tmux-revamped/tmux-plugin-template).
+## What it does
 
-<table>
-<tr>
-<td><strong>Native routing</strong><br>On tmux 3.1+ the wheel rule is a tmux format match, zero forks per scroll event.</td>
-<td><strong>No process walk</strong><br>Reads tmux pane formats directly instead of crawling the process tree.</td>
-</tr>
-<tr>
-<td><strong>No app list</strong><br>Detects apps by the alternate screen and by mouse reporting, so nothing needs to be named.</td>
-<td><strong>Graceful fallback</strong><br>Older tmux without the format operators uses a tiny check command instead.</td>
-</tr>
-</table>
+A full-screen app on the alternate screen, such as vim, less, htop or Claude Code, gets the wheel. So does any app that turned on mouse reporting. Over a shell prompt the wheel enters copy-mode and scrolls the tmux history. The decision reads two tmux formats, `#{alternate_on}` and `#{mouse_any_flag}`, so no app has to be named.
 
-## Usage
+Optional settings tune copy-mode scrolling: lines per tick, half pages or pages, leaving copy-mode at the bottom, a scroll position flash, and copying a mouse selection to the system clipboard.
 
-Turn the wheel routing on, then scroll. Over vim, less, htop, a full-screen TUI, and friends the wheel scrolls the app. Over a shell prompt it scrolls the tmux history. Nothing to press.
+## Requirements
 
-## Install
+| Requirement | Version or note |
+|:------------|:----------------|
+| tmux | 3.2 or later. The bindings also build on tmux 1.9 to 3.1, with the fallbacks in [How it works](#how-it-works) |
+| bash | 3.2 or later, so the stock macOS `/bin/bash` works |
+| Operating system | macOS on Apple Silicon and Intel, Linux on x86_64 and arm64 |
+| Core tools | BSD, GNU or uutils coreutils |
+| Clipboard tool | Optional, for `@scroll_revamped_drag_copy`: `pbcopy` on macOS, `wl-copy`, `xclip` or `xsel` on Linux |
 
-With [TPM](https://github.com/tmux-plugins/tpm), add to `~/.tmux.conf`:
+## Installation
+
+With [TPM](https://github.com/tmux-plugins/tpm), add the plugin to `~/.tmux.conf`, turn the wheel routing on, and press `prefix + I`:
 
 ```tmux
 set -g @plugin 'tmux-revamped/tmux-scroll-revamped'
 set -g @scroll_revamped_wheel 'on'
 ```
 
-Press `prefix + I`. Mouse mode is enabled automatically unless you opt out.
+Without TPM, clone the repository and run the entry point from `~/.tmux.conf`:
 
-The wheel bindings live in the root table, which every tmux-revamped member leaves to the user, so the plugin binds `WheelUpPane` and `WheelDownPane` only once `@scroll_revamped_wheel` is `on`.
+```sh
+git clone https://github.com/tmux-revamped/tmux-scroll-revamped ~/.tmux/plugins/tmux-scroll-revamped
+```
+
+```tmux
+run-shell ~/.tmux/plugins/tmux-scroll-revamped/scroll-revamped.tmux
+```
+
+## Usage
+
+With `@scroll_revamped_wheel` on, scroll. Over vim, less, htop or a full-screen TUI the wheel scrolls the app. Over a shell prompt it scrolls the tmux history. There is nothing to press.
+
+The plugin also turns tmux's `mouse` option on when it loads. Set `@scroll_revamped_mouse` to `off` to manage that option yourself.
+
+A setup that scrolls 3 lines per tick and leaves copy-mode at the bottom:
+
+```tmux
+set -g @scroll_revamped_wheel 'on'
+set -g @scroll_revamped_speed '3'
+set -g @scroll_revamped_auto_exit 'on'
+```
 
 ## Configuration
 
-Detection works out of the box once the wheel is on. The other options only exist to turn a heuristic off or to tune copy-mode.
+Set any option in `~/.tmux.conf` before the plugin loads.
 
 | Option | Default | Meaning |
-|--------|---------|---------|
-| `@scroll_revamped_wheel` | `off` | set to `on` to bind the root-table `WheelUpPane` and `WheelDownPane` that route the wheel; off leaves tmux's own wheel bindings in place |
-| `@scroll_revamped_passthrough_alternate` | `on` | pass the wheel to any app on the alternate screen; set to `off` to route alternate-screen panes into copy-mode |
-| `@scroll_revamped_passthrough_mouse` | `on` | pass the wheel to any app that has turned on mouse reporting; set to `off` to ignore the app's mouse mode |
-| `@scroll_revamped_mouse` | `on` | set to `off` to manage `mouse` yourself |
-| `@scroll_revamped_speed` | unset | a positive integer caps copy-mode wheel scrolling to that many lines per tick, taming fast trackpad flicks; unset keeps tmux's default |
-| `@scroll_revamped_select_pane` | `off` | set to `on` to focus the pane under the wheel before scrolling |
-| `@scroll_revamped_skip_empty` | `off` | set to `on` to keep the wheel out of copy-mode on a pane with no scrollback |
-| `@scroll_revamped_alt_keys` | unset | `arrow` or `page` translates the wheel into arrow or page keys for an alternate-screen app with mouse reporting off (less, man, vi), so the wheel finally scrolls it; arrow mode uses `@scroll_revamped_speed` as the count, capped at 20 keys per tick |
-| `@scroll_revamped_status_wheel` | `off` | set to `on` to switch windows when the wheel rolls over the status line |
-| `@scroll_revamped_granularity` | `line` | how far one copy-mode wheel tick scrolls: `line`, `halfpage`, or `page` |
-| `@scroll_revamped_auto_exit` | `off` | set to `on` to leave copy-mode when a downward tick is already at the bottom |
-| `@scroll_revamped_indicator` | `off` | set to `on` to flash the copy-mode scroll position on each tick (tmux 3.2+) |
-| `@scroll_revamped_drag_copy` | `off` | set to `on` to copy a mouse drag-selection to the system clipboard (pbcopy, wl-copy, xclip, or xsel) |
+|:-------|:--------|:--------|
+| `@scroll_revamped_wheel` | `off` | `on` binds the root-table `WheelUpPane` and `WheelDownPane` that route the wheel. `off` leaves tmux's own wheel bindings in place |
+| `@scroll_revamped_passthrough_alternate` | `on` | Pass the wheel to any app on the alternate screen. `off` sends those panes into copy-mode |
+| `@scroll_revamped_passthrough_mouse` | `on` | Pass the wheel to any app that turned on mouse reporting. `off` ignores the app's mouse mode |
+| `@scroll_revamped_skip_empty` | `off` | `on` keeps the wheel out of copy-mode on a pane with no scrollback |
+| `@scroll_revamped_select_pane` | `off` | `on` focuses the pane under the pointer before scrolling |
+| `@scroll_revamped_alt_keys` | unset | `arrow` or `page` turns the wheel into arrow or page keys for an alternate-screen app with mouse reporting off, such as less, man or vi. Arrow mode sends `@scroll_revamped_speed` keys per tick, 3 when unset, at most 20 |
+| `@scroll_revamped_mouse` | `on` | `off` stops the plugin from setting tmux's `mouse` option |
+| `@scroll_revamped_speed` | unset | A positive integer sets the lines one copy-mode wheel tick scrolls |
+| `@scroll_revamped_granularity` | `line` | How far one copy-mode tick scrolls: `line`, `halfpage` or `page` |
+| `@scroll_revamped_auto_exit` | `off` | `on` leaves copy-mode when a downward tick is already at the bottom |
+| `@scroll_revamped_indicator` | `off` | `on` flashes the scroll position, such as `scroll 120/4000`, on each copy-mode tick |
+| `@scroll_revamped_drag_copy` | `off` | `on` copies a mouse selection in copy-mode to the system clipboard |
+| `@scroll_revamped_status_wheel` | `off` | `on` switches windows when the wheel rolls over the status line |
 
-With both heuristics off the wheel only ever drives copy-mode, since nothing is left to detect a self-scrolling app by.
+With both passthrough options off, the wheel always enters copy-mode.
 
 ### Internal state
 
 The plugin manages these options itself. Do not set them.
 
 | Option | Holds |
-|--------|-------|
-| `@scroll_revamped_cache_key` | the pane, alternate-screen, mouse and scrollback state of the last routing decision made by the `check` fallback |
-| `@scroll_revamped_cache_val` | that decision: `0` passes the wheel to the app, `1` enters copy-mode |
+|:-------|:------|
+| `@scroll_revamped_cache_key` | The pane, alternate-screen, mouse and scrollback state of the last decision made by the tmux 1.9 check command |
+| `@scroll_revamped_cache_val` | That decision: `0` passes the wheel to the app, `1` enters copy-mode |
 
-## Compatibility
+## Key bindings
 
-Works on every tmux version TPM supports, 1.9 and up, on Linux (x86_64 and arm64) and macOS (Intel and Apple Silicon). tmux 3.1+ gets the fork-free native routing through the `#{||:}` format operator; older versions fall back to a per-event check command. `#{alternate_on}` and `#{mouse_any_flag}` exist on every supported version.
+The plugin binds no prefix key. Its bindings are mouse events, and each one waits for an option.
+
+| Key | Table | Bound when |
+|:----|:------|:-----------|
+| `WheelUpPane`, `WheelDownPane` | root | `@scroll_revamped_wheel` is `on` |
+| `WheelUpPane`, `WheelDownPane` | `copy-mode`, `copy-mode-vi` | `@scroll_revamped_speed` is set, `@scroll_revamped_granularity` is not `line`, or `@scroll_revamped_auto_exit` or `@scroll_revamped_indicator` is `on` |
+| `MouseDragEnd1Pane` | `copy-mode`, `copy-mode-vi` | `@scroll_revamped_drag_copy` is `on` and a clipboard tool is found |
+| `WheelUpStatus`, `WheelDownStatus` | root | `@scroll_revamped_status_wheel` is `on` |
+
+The root table is opt-in across the tmux-revamped family, so from 3.0.0 the wheel bindings wait for `@scroll_revamped_wheel`. The copy-mode bindings work whether or not the wheel routing is on.
+
+## How it works
+
+**Routing.** `WheelUpPane` checks one condition: the pane is on the alternate screen, or its app turned on mouse reporting, or the pane is already in a mode. When true, the wheel event goes to the pane with `send-keys -M`. When false, tmux enters copy-mode with `copy-mode -e`, which leaves again when you scroll back to the bottom. `WheelDownPane` always forwards the event, so it scrolls the app or the open copy-mode.
+
+**No fork per tick.** The condition is a tmux format inside `if-shell -F`, evaluated by tmux itself.
+
+| tmux | Routing |
+|:-----|:--------|
+| 3.1 and later | `#{\|\|:}` and `#{&&:}` format operators |
+| 2.0 to 3.0 | The same condition built from nested `#{?}` |
+| 1.9 | [`src/scroll.sh`](src/scroll.sh) `check` runs on each tick, and its answer is cached per pane state |
+
+**Copy-mode tuning.** Speed, granularity, auto-exit and the indicator rebind the wheel in the `copy-mode` and `copy-mode-vi` tables, on tmux 2.4 and later. The indicator needs tmux 3.2, the first release whose `display-message` accepts `-d`. The status-line wheel needs tmux 2.1.
 
 ## Development
 
-```bash
-make test    # bats suite
-make lint    # shellcheck
-make coverage  # kcov line coverage on Linux
-```
+| Command | What it does |
+|:--------|:-------------|
+| `make test` | Runs the bats suite |
+| `make lint` | Runs shellcheck on every shell file |
+| `make coverage` | Measures line coverage with kcov and fails below 95 percent, on Linux |
 
-The passthrough predicates live in [`src/lib/scroll/scroll.sh`](src/lib/scroll/scroll.sh) as pure functions, fixture-tested. The wheel bindings are built in [`src/lib/scroll/routing.sh`](src/lib/scroll/routing.sh) behind a single applier seam, so every routing branch is asserted through a dry-run applier that never touches a live tmux; [`scroll-revamped.tmux`](scroll-revamped.tmux) is a thin entry point that applies them.
+The bindings are built in [`src/lib/scroll/routing.sh`](src/lib/scroll/routing.sh) through one function that issues every tmux command, so the tests check each binding without a live tmux server.
 
 ## License
 
-[MIT](LICENSE), copyright Gustavo Franco.
+[MIT](LICENSE)
 
 <!-- family:begin -->
 
@@ -112,26 +167,26 @@ memory, and `family/bin/sweep` is how it is discharged.
 | [`tmux-bluetooth-revamped`](https://github.com/tmux-revamped/tmux-bluetooth-revamped) | Every connected Bluetooth device and its battery in your tmux status bar, without blocking the render |
 | [`tmux-cpu-revamped`](https://github.com/tmux-revamped/tmux-cpu-revamped) | CPU load, temperature, and frequency in your tmux status bar, without ever blocking the render |
 | [`tmux-disk-revamped`](https://github.com/tmux-revamped/tmux-disk-revamped) | Disk usage for your tmux status bar, without ever blocking the status render |
-| [`tmux-extract-revamped`](https://github.com/tmux-revamped/tmux-extract-revamped) | Fuzzy-grab any URL, path, or word off the screen and paste it, pure shell, no Python |
-| [`tmux-fzf-revamped`](https://github.com/tmux-revamped/tmux-fzf-revamped) | Jump to any session, window, or pane, or kill it, from one fzf popup |
-| [`tmux-git-revamped`](https://github.com/tmux-revamped/tmux-git-revamped) | Git repository status in your tmux status bar, without ever blocking the render |
-| [`tmux-gpu-revamped`](https://github.com/tmux-revamped/tmux-gpu-revamped) | GPU load, temperature, frequency, and memory for your tmux status bar |
-| [`tmux-kube-revamped`](https://github.com/tmux-revamped/tmux-kube-revamped) | Current Kubernetes context and namespace in your tmux status bar, async, kubectl-free, never blocking |
+| [`tmux-extract-revamped`](https://github.com/tmux-revamped/tmux-extract-revamped) | Pick a URL, path, hash or any other token off the screen with fzf and type it at the cursor, in pure shell |
+| [`tmux-fzf-revamped`](https://github.com/tmux-revamped/tmux-fzf-revamped) | Switch to, kill, rename or create tmux sessions, windows and panes from fzf pickers in a popup |
+| [`tmux-git-revamped`](https://github.com/tmux-revamped/tmux-git-revamped) | Show the active pane's git branch, changes and provider counts in the tmux status bar without blocking it |
+| [`tmux-gpu-revamped`](https://github.com/tmux-revamped/tmux-gpu-revamped) | GPU load, temperature, clock, power and memory in the tmux status bar, from NVIDIA, AMD, Intel and Apple GPUs |
+| [`tmux-kube-revamped`](https://github.com/tmux-revamped/tmux-kube-revamped) | Current Kubernetes context and namespace in the tmux status bar, parsed from kubeconfig without kubectl |
 | [`tmux-launcher-revamped`](https://github.com/tmux-revamped/tmux-launcher-revamped) | Launch any TUI app in a popup or a window, scoped to the current pane's directory, with one configurable bindi |
 | [`tmux-logging-revamped`](https://github.com/tmux-revamped/tmux-logging-revamped) | Capture any pane to a file: live logging, full scrollback, or a one-shot screenshot |
 | [`tmux-music-revamped`](https://github.com/tmux-revamped/tmux-music-revamped) | Now playing in your tmux status bar, without ever blocking the status render |
 | [`tmux-network-revamped`](https://github.com/tmux-revamped/tmux-network-revamped) | Network throughput in your tmux status bar, without ever blocking the render |
 | [`tmux-pain-control-revamped`](https://github.com/tmux-revamped/tmux-pain-control-revamped) | Standard pane and window management bindings for tmux, version aware, vim friendly, and fully configurable |
-| [`tmux-persist-revamped`](https://github.com/tmux-revamped/tmux-persist-revamped) | Save, auto-save, and restore your whole tmux environment, one plugin, no status-line tricks |
-| [`tmux-plugin-template`](https://github.com/tmux-revamped/tmux-plugin-template) | A template for building non-blocking tmux status plugins |
-| [`tmux-pomodoro-revamped`](https://github.com/tmux-revamped/tmux-pomodoro-revamped) | A Pomodoro timer in your tmux status bar, with zero temp files: all state lives in tmux options |
-| [`tmux-ram-revamped`](https://github.com/tmux-revamped/tmux-ram-revamped) | RAM usage for your tmux status bar, without ever blocking the status render |
-| [`tmux-reorder-revamped`](https://github.com/tmux-revamped/tmux-reorder-revamped) | Drag a window tab on the status bar with the mouse to move that window |
-| [`tmux-scroll-revamped`](https://github.com/tmux-revamped/tmux-scroll-revamped) | **this plugin**, Mouse wheel that does the right thing: scroll the app directly, copy-mode everywhere else. No app names to con |
-| [`tmux-sensible-revamped`](https://github.com/tmux-revamped/tmux-sensible-revamped) | Sensible tmux defaults that normalize behavior across every tmux version, OS, and terminal, without clobbering |
-| [`tmux-tiling-revamped`](https://github.com/tmux-revamped/tmux-tiling-revamped) | BSP tiling window management for tmux. Eight layouts, nineteen operations, zero dependencies |
-| [`tmux-time-revamped`](https://github.com/tmux-revamped/tmux-time-revamped) | Local clock and world clocks in your tmux status bar, without ever blocking the render |
-| [`tmux-weather-revamped`](https://github.com/tmux-revamped/tmux-weather-revamped) | Weather in your tmux status bar, fetched in the background so the render never waits on the network |
+| [`tmux-persist-revamped`](https://github.com/tmux-revamped/tmux-persist-revamped) | Save every tmux session, window and pane, auto-save on a timer, and restore it all after a reboot |
+| [`tmux-plugin-template`](https://github.com/tmux-revamped/tmux-plugin-template) | The starting point for a tmux-revamped plugin: shared library, bats harness, CI and family tooling |
+| [`tmux-pomodoro-revamped`](https://github.com/tmux-revamped/tmux-pomodoro-revamped) | A Pomodoro timer in the tmux status bar that keeps all of its state in tmux options, with no temp files |
+| [`tmux-ram-revamped`](https://github.com/tmux-revamped/tmux-ram-revamped) | RAM, swap and memory pressure in the tmux status bar, sampled in the background so the render never waits |
+| [`tmux-reorder-revamped`](https://github.com/tmux-revamped/tmux-reorder-revamped) | Drag a window tab along the tmux status bar with the mouse to move that window |
+| [`tmux-scroll-revamped`](https://github.com/tmux-revamped/tmux-scroll-revamped) | **this plugin**, Send the mouse wheel to apps that scroll themselves and into tmux copy-mode everywhere else |
+| [`tmux-sensible-revamped`](https://github.com/tmux-revamped/tmux-sensible-revamped) | Sensible tmux defaults, gated by tmux version and terminal, that leave the options you set alone |
+| [`tmux-tiling-revamped`](https://github.com/tmux-revamped/tmux-tiling-revamped) | Tiling window management for tmux: eight layouts including BSP dwindle and spiral, with layout undo |
+| [`tmux-time-revamped`](https://github.com/tmux-revamped/tmux-time-revamped) | Local and world clocks for the tmux status bar, colored by time of day, with countdowns and a DST warning |
+| [`tmux-weather-revamped`](https://github.com/tmux-revamped/tmux-weather-revamped) | Weather for the tmux status bar from wttr.in, fetched in the background so the status line never waits |
 
 ### Checking an installation
 
