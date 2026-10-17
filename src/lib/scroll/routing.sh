@@ -274,7 +274,9 @@ scroll_main() {
   local ver
   ver="$(scroll_tmux_version)"
   [[ "$(scroll_opt mouse on)" == "on" ]] && scroll_emit set-option -g mouse on
-  scroll_build_wheel "${ver}"
+  if [[ "$(scroll_opt wheel off)" == "on" ]]; then
+    scroll_build_wheel "${ver}"
+  fi
   scroll_build_copymode "${ver}"
   scroll_build_status "${ver}"
 }

@@ -32,6 +32,7 @@ tmux_ge() {
 
 @test "entrypoint - alternate-screen apps get the wheel by default" {
   tmux_ge "3.1" || skip "native routing needs tmux 3.1+"
+  tmux set-option -g @scroll_revamped_wheel on
   run_entrypoint
   run wheel_binding
   [ "${status}" -eq 0 ]
@@ -40,6 +41,7 @@ tmux_ge() {
 
 @test "entrypoint - passthrough_alternate off drops the alternate-screen term" {
   tmux_ge "3.1" || skip "native routing needs tmux 3.1+"
+  tmux set-option -g @scroll_revamped_wheel on
   tmux set-option -g @scroll_revamped_passthrough_alternate off
   run_entrypoint
   run wheel_binding
@@ -50,6 +52,7 @@ tmux_ge() {
 
 @test "entrypoint - apps with mouse reporting get the wheel by default" {
   tmux_ge "3.1" || skip "native routing needs tmux 3.1+"
+  tmux set-option -g @scroll_revamped_wheel on
   run_entrypoint
   run wheel_binding
   [ "${status}" -eq 0 ]
@@ -58,9 +61,22 @@ tmux_ge() {
 
 @test "entrypoint - passthrough_mouse off drops the mouse-flag term" {
   tmux_ge "3.1" || skip "native routing needs tmux 3.1+"
+  tmux set-option -g @scroll_revamped_wheel on
   tmux set-option -g @scroll_revamped_passthrough_mouse off
   run_entrypoint
   run wheel_binding
   [ "${status}" -eq 0 ]
   [[ "${output}" != *"mouse_any_flag"* ]]
+}
+
+@test "entrypoint - the wheel bindings are unbound by default" {
+  # Arrange
+  local before
+  before="$(tmux list-keys -T root WheelUpPane 2>/dev/null)"
+
+  # Act
+  run_entrypoint
+
+  # Assert
+  [[ "$(tmux list-keys -T root WheelUpPane 2>/dev/null)" == "${before}" ]]
 }

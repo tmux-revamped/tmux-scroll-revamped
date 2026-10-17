@@ -322,6 +322,7 @@ teardown() {
 
 @test "routing - scroll_main wires mouse and every binding set" {
   scroll_tmux_version() { printf '3.5'; }
+  set_tmux_option "@scroll_revamped_wheel" "on"
   set_tmux_option "@scroll_revamped_status_wheel" "on"
   set_tmux_option "@scroll_revamped_granularity" "page"
   local out
@@ -330,6 +331,18 @@ teardown() {
   [[ "${out}" == *"WheelUpPane"* ]]
   [[ "${out}" == *"WheelUpStatus"* ]]
   [[ "${out}" == *"copy-mode] [WheelUpPane] [send-keys -X page-up"* ]]
+}
+
+@test "routing - scroll_main binds no wheel key by default" {
+  # Arrange
+  scroll_tmux_version() { printf '3.5'; }
+
+  # Act
+  run scroll_main
+
+  # Assert
+  [[ "${output}" != *"WheelUpPane"* ]] || false
+  [[ "${output}" != *"WheelDownPane"* ]]
 }
 
 @test "routing - scroll_main leaves mouse alone when opted out" {

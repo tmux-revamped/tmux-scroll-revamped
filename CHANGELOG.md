@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-10-17
+
+### Changed
+
+- **Breaking:** the root-table `WheelUpPane` and `WheelDownPane` bindings
+  are unbound by default, since the root table is opt-in across the
+  tmux-revamped family. Set `@scroll_revamped_wheel` to `on` to bind them
+  as before.
+
 ### Fixed
 
 - The tmux 1.9 fallback wheel binding quotes the plugin path, so a checkout

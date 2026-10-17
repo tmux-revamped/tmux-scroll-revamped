@@ -4,13 +4,13 @@
 
 **Mouse wheel that does the right thing: scroll the app directly, copy-mode everywhere else. No app names to configure.**
 
-[![Tests](https://github.com/tmux-revamped/tmux-scroll-revamped/actions/workflows/tests.yml/badge.svg)](https://github.com/tmux-revamped/tmux-scroll-revamped/actions/workflows/tests.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](CHANGELOG.md)
+[![Tests](https://github.com/tmux-revamped/tmux-scroll-revamped/actions/workflows/tests.yml/badge.svg)](https://github.com/tmux-revamped/tmux-scroll-revamped/actions/workflows/tests.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](CHANGELOG.md)
 
 </div>
 
 **name-free routing** · **no per-event fork** · **tmux 1.9 to 3.5** · **95%+** coverage
 
-Makes the mouse wheel behave, with nothing to configure. A full-screen app on the alternate screen, a TUI like Claude Code, vim, less, or htop, owns the wheel, and so does any app that has turned on mouse reporting. Everywhere else the wheel enters copy-mode and scrolls the scrollback. Detection reads two tmux formats, `#{alternate_on}` and `#{mouse_any_flag}`, so every app that can use the wheel gets it without ever being named. On tmux 3.1+ the decision is a **native format match**, so unlike mighty-scroll there is no process-tree walk and no shell forked on every wheel tick.
+Makes the mouse wheel behave, with one option to turn it on. A full-screen app on the alternate screen, a TUI like Claude Code, vim, less, or htop, owns the wheel, and so does any app that has turned on mouse reporting. Everywhere else the wheel enters copy-mode and scrolls the scrollback. Detection reads two tmux formats, `#{alternate_on}` and `#{mouse_any_flag}`, so every app that can use the wheel gets it without ever being named. On tmux 3.1+ the decision is a **native format match**, so unlike mighty-scroll there is no process-tree walk and no shell forked on every wheel tick.
 
 Built from [tmux-plugin-template](https://github.com/tmux-revamped/tmux-plugin-template).
 
@@ -27,7 +27,7 @@ Built from [tmux-plugin-template](https://github.com/tmux-revamped/tmux-plugin-t
 
 ## Usage
 
-Install it and scroll. Over vim, less, htop, a full-screen TUI, and friends the wheel scrolls the app. Over a shell prompt it scrolls the tmux history. Nothing to press.
+Turn the wheel routing on, then scroll. Over vim, less, htop, a full-screen TUI, and friends the wheel scrolls the app. Over a shell prompt it scrolls the tmux history. Nothing to press.
 
 ## Install
 
@@ -35,16 +35,20 @@ With [TPM](https://github.com/tmux-plugins/tpm), add to `~/.tmux.conf`:
 
 ```tmux
 set -g @plugin 'tmux-revamped/tmux-scroll-revamped'
+set -g @scroll_revamped_wheel 'on'
 ```
 
 Press `prefix + I`. Mouse mode is enabled automatically unless you opt out.
 
+The wheel bindings live in the root table, which every tmux-revamped member leaves to the user, so the plugin binds `WheelUpPane` and `WheelDownPane` only once `@scroll_revamped_wheel` is `on`.
+
 ## Configuration
 
-Detection works out of the box. The options below only exist to turn a heuristic off or to tune copy-mode.
+Detection works out of the box once the wheel is on. The other options only exist to turn a heuristic off or to tune copy-mode.
 
 | Option | Default | Meaning |
 |--------|---------|---------|
+| `@scroll_revamped_wheel` | `off` | set to `on` to bind the root-table `WheelUpPane` and `WheelDownPane` that route the wheel; off leaves tmux's own wheel bindings in place |
 | `@scroll_revamped_passthrough_alternate` | `on` | pass the wheel to any app on the alternate screen; set to `off` to route alternate-screen panes into copy-mode |
 | `@scroll_revamped_passthrough_mouse` | `on` | pass the wheel to any app that has turned on mouse reporting; set to `off` to ignore the app's mouse mode |
 | `@scroll_revamped_mouse` | `on` | set to `off` to manage `mouse` yourself |
