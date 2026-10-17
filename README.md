@@ -60,6 +60,15 @@ Detection works out of the box. The options below only exist to turn a heuristic
 
 With both heuristics off the wheel only ever drives copy-mode, since nothing is left to detect a self-scrolling app by.
 
+### Internal state
+
+The plugin manages these options itself. Do not set them.
+
+| Option | Holds |
+|--------|-------|
+| `@scroll_revamped_cache_key` | the pane, alternate-screen, mouse and scrollback state of the last routing decision made by the `check` fallback |
+| `@scroll_revamped_cache_val` | that decision: `0` passes the wheel to the app, `1` enters copy-mode |
+
 ## Compatibility
 
 Works on every tmux version TPM supports, 1.9 and up, on Linux (x86_64 and arm64) and macOS (Intel and Apple Silicon). tmux 3.1+ gets the fork-free native routing through the `#{||:}` format operator; older versions fall back to a per-event check command. `#{alternate_on}` and `#{mouse_any_flag}` exist on every supported version.
