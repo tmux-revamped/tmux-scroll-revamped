@@ -47,4 +47,6 @@ Guidance for anyone, human or agent, changing tmux-scroll-revamped. What it is a
 
 ## Gaps against FAMILY.md
 
-As of 2026-11-16, none.
+As of 2026-11-16:
+
+- No test presses its wheel bindings through a real client; the suites check the bound commands and call them directly.
