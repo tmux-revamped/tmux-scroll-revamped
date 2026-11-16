@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.1](https://github.com/tmux-revamped/tmux-scroll-revamped/compare/v3.1.0...v3.1.1) (2026-11-16)
+
+
+### Bug Fixes
+
+* bind the other keys when one key is invalid ([5e06371](https://github.com/tmux-revamped/tmux-scroll-revamped/commit/5e06371913b5ca41ea40b6ad9a778bd07bbf5009))
+
 # [3.1.0](https://github.com/tmux-revamped/tmux-scroll-revamped/compare/v3.0.0...v3.1.0) (2026-11-16)
 
 
