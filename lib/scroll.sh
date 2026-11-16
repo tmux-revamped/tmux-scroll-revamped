@@ -284,7 +284,25 @@ scroll_revamped_apply() {
 ${SCROLL_REVAMPED_PLAN}
 PLAN
   [ "$#" -gt 0 ] || return 0
-  tmux "$@"
+  tmux "$@" 2>/dev/null && return 0
+  scroll_revamped_apply_each
+}
+
+scroll_revamped_apply_each() {
+  scroll_revamped_apply_each_status=0
+  set --
+  while IFS= read -r scroll_revamped_apply_each_line; do
+    if [ -n "${scroll_revamped_apply_each_line}" ]; then
+      set -- "$@" "${scroll_revamped_apply_each_line}"
+      continue
+    fi
+    [ "$#" -gt 0 ] || continue
+    tmux "$@" || scroll_revamped_apply_each_status=1
+    set --
+  done <<PLAN
+${SCROLL_REVAMPED_PLAN}
+PLAN
+  return "${scroll_revamped_apply_each_status}"
 }
 
 scroll_revamped_decide() {
