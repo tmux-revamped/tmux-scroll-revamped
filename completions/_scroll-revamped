@@ -1,0 +1,37 @@
+#compdef scroll-revamped
+
+_scroll_revamped() {
+  local -a commands
+  commands=(
+    'apply:bind the wheel now'
+    'list:print every binding apply would make'
+    'check:decide one wheel tick on tmux before 2.0'
+    'doctor:check this machine'
+    'version:print the version'
+    'help:print the help page'
+  )
+
+  _arguments \
+    '--json[list prints one JSON object]' \
+    '--theme[colours of the terminal interface]:theme:(kodougu catppuccin-mocha catppuccin-latte dracula nord gruvbox tokyo-night mono)' \
+    '--wheel[route the wheel]:value:(on off)' \
+    '--passthrough-alternate[pass the wheel to full-screen apps]:value:(on off)' \
+    '--passthrough-mouse[pass the wheel to apps that ask for the mouse]:value:(on off)' \
+    '--skip-empty[keep empty panes out of copy-mode]:value:(on off)' \
+    '--select-pane[focus the pane under the pointer]:value:(on off)' \
+    '--alt-keys[keys for full-screen apps without the mouse]:value:(arrow page)' \
+    '--mouse[set tmux mouse on]:value:(on off)' \
+    '--speed[lines per copy-mode tick]:value:' \
+    '--granularity[how far a copy-mode tick scrolls]:value:(line halfpage page)' \
+    '--auto-exit[leave copy-mode at the bottom]:value:(on off)' \
+    '--indicator[flash the scroll position]:value:(on off)' \
+    '--drag-copy[copy a selection to the clipboard]:value:(on off)' \
+    '--status-wheel[switch windows over the status line]:value:(on off)' \
+    '1:command:->command'
+
+  if [[ "${state}" == command ]]; then
+    _describe 'command' commands
+  fi
+}
+
+_scroll_revamped "$@"

@@ -1,10 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-chmod +x "${CURRENT_DIR}/src/scroll.sh" 2>/dev/null || true
-
-# shellcheck source=/dev/null
-source "${CURRENT_DIR}/src/lib/scroll/routing.sh"
-
-scroll_main
+scroll_revamped_dir=$(cd "$(dirname "$0")" && pwd)
+"${scroll_revamped_dir}/bin/scroll-revamped" apply

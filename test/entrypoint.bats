@@ -1,8 +1,13 @@
 #!/usr/bin/env bats
+# shellcheck disable=SC2030,SC2031,SC2034,SC2154
 
-load "${BATS_TEST_DIRNAME}/tmux_helpers.bash"
+# shellcheck source=test/tmux_helpers.bash
+source "${BATS_TEST_DIRNAME:-.}/tmux_helpers.bash"
+
+bats_require_minimum_version 1.5.0
 
 setup() {
+  ROOT="$(cd "${BATS_TEST_DIRNAME}/.." && pwd)"
   setup_tmux_server
 }
 
@@ -10,71 +15,107 @@ teardown() {
   teardown_tmux_server
 }
 
-wheel_binding() {
-  tmux list-keys 2>/dev/null | grep WheelUpPane | grep root
-}
-
-run_entrypoint() {
+load_plugin() {
   local quoted
-  printf -v quoted '%q' "${PLUGIN_DIR}/scroll-revamped.tmux"
-  tmux run-shell "${quoted}"
+  quoted=$(printf '%s' "$1" | sed "s/'/'\\\\''/g")
+  tmux run-shell "'${quoted}/scroll-revamped.tmux'"
 }
 
-tmux_ge() {
-  local have have_major have_minor need_major need_minor
-  have="$(command tmux -V | sed -E 's/^tmux [^0-9]*([0-9]+\.[0-9]+).*/\1/')"
-  IFS=. read -r have_major have_minor <<<"${have}"
-  IFS=. read -r need_major need_minor <<<"${1}"
-  (( have_major > need_major || (have_major == need_major && have_minor >= need_minor) ))
+key_binding() {
+  local table
+  table=$(tmux list-keys -T "$1")
+  awk -v key="$2" '{ for (i = 1; i < NF; i++) { if ($i == "-T") { if ($(i + 2) == key) { print } break } } }' <<<"${table}"
 }
 
-@test "entrypoint - alternate-screen apps get the wheel by default" {
-  tmux_ge "3.1" || skip "native routing needs tmux 3.1+"
-  tmux set-option -g @scroll_revamped_wheel on
-  run_entrypoint
-  run wheel_binding
-  [ "${status}" -eq 0 ]
-  [[ "${output}" == *"alternate_on"* ]]
+check() {
+  # shellcheck disable=SC2086
+  TMUX="${TMUX_SOCKET},1,0" run ${REVAMPED_TEST_SHELL:-sh} "${ROOT}/bin/scroll-revamped" check "$@"
 }
 
-@test "entrypoint - passthrough_alternate off drops the alternate-screen term" {
-  tmux_ge "3.1" || skip "native routing needs tmux 3.1+"
-  tmux set-option -g @scroll_revamped_wheel on
-  tmux set-option -g @scroll_revamped_passthrough_alternate off
-  run_entrypoint
-  run wheel_binding
-  [ "${status}" -eq 0 ]
-  [[ "${output}" != *"alternate_on"* ]]
-  [[ "${output}" == *"mouse_any_flag"* ]]
-}
-
-@test "entrypoint - apps with mouse reporting get the wheel by default" {
-  tmux_ge "3.1" || skip "native routing needs tmux 3.1+"
-  tmux set-option -g @scroll_revamped_wheel on
-  run_entrypoint
-  run wheel_binding
-  [ "${status}" -eq 0 ]
-  [[ "${output}" == *"mouse_any_flag"* ]]
-}
-
-@test "entrypoint - passthrough_mouse off drops the mouse-flag term" {
-  tmux_ge "3.1" || skip "native routing needs tmux 3.1+"
-  tmux set-option -g @scroll_revamped_wheel on
-  tmux set-option -g @scroll_revamped_passthrough_mouse off
-  run_entrypoint
-  run wheel_binding
-  [ "${status}" -eq 0 ]
-  [[ "${output}" != *"mouse_any_flag"* ]]
-}
-
-@test "entrypoint - the wheel bindings are unbound by default" {
+@test "entrypoint - loading turns the mouse on and keeps tmux's wheel by default" {
   # Arrange
-  local before
-  before="$(tmux list-keys -T root WheelUpPane 2>/dev/null)"
+  local stock
+  stock=$(key_binding root WheelUpPane)
 
   # Act
-  run_entrypoint
+  load_plugin "${ROOT}"
 
   # Assert
-  [[ "$(tmux list-keys -T root WheelUpPane 2>/dev/null)" == "${before}" ]]
+  run get_option mouse
+  [[ "${output}" == "on" ]]
+  run key_binding root WheelUpPane
+  [[ "${output}" == "${stock}" ]]
+}
+
+@test "entrypoint - the wheel option routes the wheel through one format" {
+  # Arrange
+  set_option @scroll_revamped_wheel on
+
+  # Act
+  load_plugin "${ROOT}"
+
+  # Assert
+  run key_binding root WheelUpPane
+  [[ "${output}" == *"if-shell -F"*"#{alternate_on}"*"copy-mode -e"* ]]
+  run key_binding root WheelDownPane
+  [[ "${output}" == *"send-keys -M"* ]]
+}
+
+@test "entrypoint - copy-mode options bind both copy-mode tables" {
+  # Arrange
+  set_option @scroll_revamped_speed 4
+
+  # Act
+  load_plugin "${ROOT}"
+
+  # Assert
+  run key_binding copy-mode WheelUpPane
+  [[ "${output}" == *"send-keys -X -N 4 scroll-up"* ]]
+  run key_binding copy-mode-vi WheelDownPane
+  [[ "${output}" == *"send-keys -X -N 4 scroll-down"* ]]
+}
+
+@test "entrypoint - git tracks the entry point and the tool as executable" {
+  # Arrange
+  local entry=scroll-revamped.tmux tool=bin/scroll-revamped
+
+  # Act
+  run git -C "${ROOT}" ls-files --stage -- "${entry}" "${tool}"
+
+  # Assert
+  [[ "${lines[0]}" == 100755\ * ]]
+  [[ "${lines[1]}" == 100755\ * ]]
+}
+
+@test "check - a decision is stored and a repeat is answered from it" {
+  # Arrange
+  check 0 0 5 %0
+
+  # Act
+  check 0 0 5 %0
+
+  # Assert
+  [[ "${status}" -eq 1 ]]
+  run get_option @scroll_revamped_cache_key
+  [[ "${output}" == "%0|0|0|5" ]]
+  run get_option @scroll_revamped_cache_val
+  [[ "${output}" == "1" ]]
+}
+
+@test "check - the cached tool path survives tmux's parser from a path with a space, a quote and a hash" {
+  # Arrange
+  local copy="${BATS_TEST_TMPDIR}/it's \"a\" #1 dir" tool
+  mkdir -p "${copy}"
+  cp -Rf "${ROOT}/bin" "${ROOT}/lib" "${copy}/"
+  tool=$(REVAMPED_LIB="${copy}/lib" sh -c '. "${REVAMPED_LIB}/scroll.sh"; scroll_revamped_tool')
+  printf 'if-shell "%s check '"'"'1'"'"' '"'"'0'"'"' '"'"''"'"' '"'"'%%0'"'"'" "set -g @probe pass" "set -g @probe copy"\n' "${tool}" >"${BATS_TEST_TMPDIR}/probe.conf"
+
+  # Act
+  tmux source-file "${BATS_TEST_TMPDIR}/probe.conf"
+
+  # Assert
+  run get_option @probe
+  [[ "${output}" == "pass" ]]
+  run get_option @scroll_revamped_cache_val
+  [[ "${output}" == "0" ]]
 }

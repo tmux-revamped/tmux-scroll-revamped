@@ -1,0 +1,3 @@
+$ scroll-revamped frobnicate
+scroll-revamped: unknown command 'frobnicate'. run 'scroll-revamped help' for usage.
+exit 1

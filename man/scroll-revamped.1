@@ -1,0 +1,205 @@
+.TH SCROLL-REVAMPED 1 "2026-11-16" "scroll-revamped" "User Commands"
+.SH NAME
+scroll-revamped \- the mouse wheel to apps that scroll, copy-mode for the rest
+.SH SYNOPSIS
+.B scroll-revamped
+.RI [ options ]
+.B apply
+.br
+.B scroll-revamped
+.RB [ \-\-json ]
+.B list
+.br
+.B scroll-revamped check
+.I alternate mouse history pane
+.br
+.B scroll-revamped doctor
+.br
+.B scroll-revamped version
+.br
+.B scroll-revamped help
+.SH DESCRIPTION
+.B scroll-revamped
+routes the mouse wheel in tmux. A pane running an app that scrolls itself,
+such as vim, less or htop, gets the wheel; any other pane enters copy-mode and
+scrolls its history. It also tunes copy-mode scrolling, copies a mouse
+selection to the system clipboard, and switches windows when the wheel rolls
+over the status line. The entry point
+.B scroll-revamped.tmux
+runs
+.B apply
+once when tmux loads the plugin, and every binding goes to tmux in one call.
+.PP
+Run with no command on a terminal, it offers a menu.
+.SH COMMANDS
+.TP
+.B apply
+Bind the wheel now.
+.TP
+.B list
+Print every binding apply would make, one per line.
+.TP
+.BI check " alternate mouse history pane"
+Decide one wheel tick on tmux before 2.0, where the wheel cannot be decided by
+a format: exit 0 to pass the tick to the app, 1 to enter copy-mode. The last
+decision is cached in
+.B @scroll_revamped_cache_key
+and
+.BR @scroll_revamped_cache_val .
+.TP
+.B doctor
+Print one row per dependency: tmux, the clipboard tool drag copy uses, gum and
+the core tools. Exits 1 only when a required tool is missing.
+.TP
+.B version
+Print the version, then the tmux version.
+.TP
+.B help
+Print the help page.
+.SH OPTIONS
+.TP
+.B \-\-json
+.B list
+prints one JSON object.
+.TP
+.BI \-\-theme " name"
+Colours of the terminal interface:
+.BR kodougu ,
+.BR catppuccin\-mocha ,
+.BR catppuccin\-latte ,
+.BR dracula ,
+.BR nord ,
+.BR gruvbox ,
+.B tokyo\-night
+or
+.BR mono .
+The default is
+.BR kodougu .
+.TP
+.BI \-\- setting " value"
+Any tmux option below, named with dashes, such as
+.B \-\-wheel
+or
+.BR \-\-skip\-empty .
+It also takes the form
+.IR \-\-setting = value .
+.SH ENVIRONMENT
+.TP
+.B SCROLL_REVAMPED_SETTING
+Any tmux option below in capitals, such as
+.BR SCROLL_REVAMPED_WHEEL .
+The command line wins over the environment, and the environment over the
+tmux option.
+.TP
+.B SCROLL_REVAMPED_THEME
+The theme when
+.B \-\-theme
+is not given.
+.TP
+.B SCROLL_REVAMPED_ACCENT
+A colour such as #CBA6F7 that replaces the accent of the theme.
+.TP
+.B KODOUGU_THEME
+The theme of every kodougu and tmux-revamped tool, when neither
+.B \-\-theme
+nor
+.B SCROLL_REVAMPED_THEME
+is set.
+.TP
+.B KODOUGU_ACCENT
+The accent of every kodougu and tmux-revamped tool, when
+.B SCROLL_REVAMPED_ACCENT
+is not set.
+.TP
+.B NO_COLOR
+Turns colour off in every theme.
+.SH TMUX OPTIONS
+An empty tmux option means its default.
+.TP
+.B @scroll_revamped_wheel
+.B on
+binds the root-table WheelUpPane and WheelDownPane that route the wheel. The
+default is
+.BR off ,
+which leaves tmux's own wheel bindings in place.
+.TP
+.B @scroll_revamped_passthrough_alternate
+Pass the wheel to an app on the alternate screen. The default is
+.BR on .
+.TP
+.B @scroll_revamped_passthrough_mouse
+Pass the wheel to an app that asked for the mouse. The default is
+.BR on .
+.TP
+.B @scroll_revamped_skip_empty
+.B on
+keeps the wheel out of copy-mode on a pane with no history. The default is
+.BR off .
+.TP
+.B @scroll_revamped_select_pane
+.B on
+focuses the pane under the pointer before scrolling. The default is
+.BR off .
+.TP
+.B @scroll_revamped_alt_keys
+.B arrow
+or
+.B page
+turns the wheel into arrow or page keys for an alternate-screen app with the
+mouse off, such as less, man or vi. Arrow mode sends
+.B @scroll_revamped_speed
+keys per tick, 3 when it is unset, at most 20. Needs tmux 2.0.
+.TP
+.B @scroll_revamped_mouse
+.B off
+stops the plugin from setting tmux's
+.B mouse
+option. The default is
+.BR on .
+.TP
+.B @scroll_revamped_speed
+A positive whole number of lines one copy-mode tick scrolls.
+.TP
+.B @scroll_revamped_granularity
+How far one copy-mode tick scrolls:
+.BR line ,
+.B halfpage
+or
+.BR page .
+The default is
+.BR line .
+.TP
+.B @scroll_revamped_auto_exit
+.B on
+leaves copy-mode when a downward tick is already at the bottom. The default is
+.BR off .
+.TP
+.B @scroll_revamped_indicator
+.B on
+flashes the scroll position on each copy-mode tick, on tmux 3.2 and later. The
+default is
+.BR off .
+.TP
+.B @scroll_revamped_drag_copy
+.B on
+copies a mouse selection in copy-mode to the system clipboard through
+pbcopy, wl-copy, xclip or xsel. The default is
+.BR off .
+.TP
+.B @scroll_revamped_status_wheel
+.B on
+switches windows when the wheel rolls over the status line, on tmux 2.1 and
+later. The default is
+.BR off .
+.TP
+.B @revamped_theme
+The theme of every tmux-revamped tool, when nothing else sets one. The default
+is
+.BR kodougu .
+.SH EXIT STATUS
+0 on success, 1 on any failure;
+.B check
+exits 1 to mean copy-mode.
+.SH SEE ALSO
+.BR tmux (1),
+.BR gum (1)

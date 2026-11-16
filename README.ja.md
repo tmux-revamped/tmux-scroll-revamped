@@ -2,63 +2,59 @@
 
 # tmux-scroll-revamped
 
-<strong>自分でスクロールできるアプリにはマウスホイールを渡し、それ以外ではtmuxのコピーモードに入ります。</strong>
+<strong>マウスホイールを、自分でスクロールするアプリへ送り、それ以外では tmux のコピーモードに入ります。</strong>
 
-[English](README.md) | 日本語 | [简体中文](README.zh-Hans.md) | [繁體中文（香港）](README.zh-HK.md)
+[English](README.md) &nbsp;|&nbsp; 日本語 &nbsp;|&nbsp; [简体中文](README.zh-Hans.md) &nbsp;|&nbsp; [繁體中文（香港）](README.zh-HK.md)
 
-[![family](https://img.shields.io/github/actions/workflow/status/tmux-revamped/tmux-scroll-revamped/family.yml?branch=main&style=flat-square&label=family)](https://github.com/tmux-revamped/tmux-scroll-revamped/actions/workflows/family.yml)
-[![tests](https://img.shields.io/github/actions/workflow/status/tmux-revamped/tmux-scroll-revamped/tests.yml?branch=main&style=flat-square&label=tests)](https://github.com/tmux-revamped/tmux-scroll-revamped/actions/workflows/tests.yml)
+[![ci](https://img.shields.io/github/actions/workflow/status/tmux-revamped/tmux-scroll-revamped/ci.yml?branch=main&style=flat-square&label=ci)](https://github.com/tmux-revamped/tmux-scroll-revamped/actions/workflows/ci.yml)
 [![release](https://img.shields.io/github/v/release/tmux-revamped/tmux-scroll-revamped?style=flat-square&label=release)](https://github.com/tmux-revamped/tmux-scroll-revamped/releases/latest)
 [![openssf scorecard](https://img.shields.io/ossf-scorecard/github.com/tmux-revamped/tmux-scroll-revamped?style=flat-square&label=openssf%20scorecard)](https://scorecard.dev/viewer/?uri=github.com/tmux-revamped/tmux-scroll-revamped)
 [![license](https://img.shields.io/github/license/tmux-revamped/tmux-scroll-revamped?style=flat-square&label=license)](LICENSE)
 
 <p align="center">
-  <a href="#what-it-does">概要</a> |
-  <a href="#installation">インストール</a> |
-  <a href="#usage">使い方</a> |
-  <a href="#configuration">設定</a> |
-  <a href="#key-bindings">キーバインド</a> |
-  <a href="#how-it-works">仕組み</a>
+  <a href="#クイックスタート"><strong>クイックスタート</strong></a> &nbsp;|&nbsp;
+  <a href="#使い方">使い方</a> &nbsp;|&nbsp;
+  <a href="#判断のしかた">判断のしかた</a> &nbsp;|&nbsp;
+  <a href="#画面">画面</a>
 </p>
 
 </div>
 
-**tmux 2.0以降では、ホイールを1回回すごとに起動するプロセスは0個です。設定するアプリ名は0個です。オプションは13個です。macOSとLinuxでテストしています。**
+<p align="center">
+  <img src="screens/hero.gif" alt="シェルではコピーモードへ、less へはホイールを送り、位置を表示し、ウィンドウを切り替える scroll-revamped" width="800">
+</p>
+
+```console
+$ scroll-revamped --wheel on list
+set-option -g mouse on
+bind-key -n WheelUpPane if-shell -F "#{?#{||:#{alternate_on},#{||:#{mouse_any_flag},#{pane_in_mode}}},1,0}" "send-keys -M" "copy-mode -e ; send-keys -M"
+bind-key -n WheelDownPane send-keys -M
+```
+
+vim、less、htop、Claude Code のように代替画面で動く全画面アプリにはホイールがそのまま届き、マウスを求めたアプリにも届きます。シェルのプロンプトの上では、ホイールがコピーモードに入って tmux の履歴をスクロールします。判断は tmux のフォーマットで行うので、アプリを名指しせず、1 回のスクロールごとにプロセスも起動しません。
 
 ---
 
-<a id="what-it-does"></a>
+## クイックスタート
 
-## 概要
+### 前提条件
 
-vim、less、htop、Claude Codeのように代替画面で動く全画面のアプリはホイールを受け取ります。マウスレポートを有効にしたアプリも同じです。シェルのプロンプトの上では、ホイールでコピーモードに入り、tmuxの履歴をスクロールします。判定は`#{alternate_on}`と`#{mouse_any_flag}`という2つのtmuxの書式を読むだけなので、アプリの名前を指定する必要はありません。
+| ツール | バージョン | 用途 |
+|:-----|:--------|:---------|
+| tmux | 3.2 以降 | ファミリー共通の最低バージョン。tmux 1.9 から 3.1 でも、判断のしかたに書いた代替手段で割り当てを組み立てます |
+| クリップボードのツール | 任意 | `@scroll_revamped_drag_copy` 用。macOS では `pbcopy`、Linux では `wl-copy`、`xclip`、`xsel` |
+| gum | 任意 | `scroll-revamped` のメニュー、表、色。なくてもすべてのコマンドがプレーンテキストで動きます |
 
-任意の設定でコピーモードのスクロールを調整できます。1回あたりの行数、半ページやページ単位の移動、末尾でのコピーモードの終了、スクロール位置の表示、マウスで選択した範囲のシステムクリップボードへのコピーです。
-
-## 必要なもの
-
-| 項目 | バージョンや補足 |
-|:------------|:----------------|
-| tmux | 3.2以降。[仕組み](#how-it-works)にある代替手段により、バインドはtmux 1.9から3.1でも組み立てられます |
-| bash | 3.2以降。macOS標準の`/bin/bash`で動きます |
-| OS | Apple SiliconとIntelのmacOS、x86_64とarm64のLinux |
-| 基本コマンド | BSD、GNU、uutilsのいずれのcoreutilsでも動きます |
-| クリップボードのツール | 任意。`@scroll_revamped_drag_copy`に使います。macOSでは`pbcopy`、Linuxでは`wl-copy`、`xclip`、`xsel`のいずれかです |
-
-<a id="installation"></a>
-
-## インストール
-
-[TPM](https://github.com/tmux-plugins/tpm)を使う場合は、`~/.tmux.conf`にプラグインを追加し、ホイールの振り分けを有効にして`prefix + I`を押します。
+### インストール
 
 ```tmux
 set -g @plugin 'tmux-revamped/tmux-scroll-revamped'
 set -g @scroll_revamped_wheel 'on'
 ```
 
-TPMを使わない場合は、リポジトリをクローンし、`~/.tmux.conf`からエントリーポイントを実行します。
+続けて `prefix + I` を押します。TPM を使わない場合は、リポジトリをクローンし、`~/.tmux.conf` からエントリーポイントを実行します。
 
-```sh
+```bash
 git clone https://github.com/tmux-revamped/tmux-scroll-revamped ~/.tmux/plugins/tmux-scroll-revamped
 ```
 
@@ -66,99 +62,137 @@ git clone https://github.com/tmux-revamped/tmux-scroll-revamped ~/.tmux/plugins/
 run-shell ~/.tmux/plugins/tmux-scroll-revamped/scroll-revamped.tmux
 ```
 
-<a id="usage"></a>
+クローンで `make install` を実行すると、`scroll-revamped` が `~/.local/bin` に、manページと補完が `~/.local/share` の下に入ります。
+
+### 確認
+
+```bash
+~/.tmux/plugins/tmux-scroll-revamped/bin/scroll-revamped doctor
+```
 
 ## 使い方
 
-`@scroll_revamped_wheel`を有効にしたら、あとはスクロールするだけです。vim、less、htop、全画面のTUIの上では、ホイールはアプリをスクロールします。シェルのプロンプトの上では、tmuxの履歴をスクロールします。押すキーはありません。
+`@scroll_revamped_wheel` を `on` にしてスクロールします。vim、less、htop などの全画面アプリの上ではアプリがスクロールし、シェルのプロンプトの上では tmux の履歴がスクロールします。プラグインは tmux の `mouse` オプションも `on` にします。自分で管理するときは `@scroll_revamped_mouse` を `off` にします。
 
-プラグインは読み込み時にtmuxの`mouse`オプションも有効にします。このオプションを自分で管理するには、`@scroll_revamped_mouse`を`off`にします。
+| コマンド | 動作 |
+|:--------|:-------------|
+| `scroll-revamped apply` | ホイールを今すぐ割り当てます。プラグインの読み込み時にエントリーポイントが実行します |
+| `scroll-revamped list` | apply が行う割り当てをすべて表示します。`--json` で 1 つのオブジェクトを出力します |
+| `scroll-revamped check ALT MOUSE HISTORY PANE` | tmux 2.0 より前で 1 回のスクロールを判断します。アプリへ渡すときは 0、コピーモードに入るときは 1 で終わります |
+| `scroll-revamped doctor` | 依存関係ごとに 1 行。クリップボードのツールも含みます |
+| `scroll-revamped version` | バージョンと tmux のバージョン |
+| `scroll-revamped help` | ヘルプ。`man scroll-revamped` にも同じコマンドと設定があります |
+| `scroll-revamped` | 端末ではメニュー |
 
-1回で3行スクロールし、末尾でコピーモードを抜ける設定の例です。
+| tmux オプション | 既定値 | 意味 |
+|:------------|:--------|:--------|
+| `@scroll_revamped_wheel` | `off` | `on` でホイールを振り分けるルートテーブルの `WheelUpPane` と `WheelDownPane` を割り当てます。`off` では tmux 自身のホイールのままです |
+| `@scroll_revamped_passthrough_alternate` | `on` | 代替画面のアプリにホイールを渡します。`off` ではそのペインもコピーモードに入ります |
+| `@scroll_revamped_passthrough_mouse` | `on` | マウスを求めたアプリにホイールを渡します |
+| `@scroll_revamped_skip_empty` | `off` | `on` で履歴のないペインをコピーモードに入れません |
+| `@scroll_revamped_select_pane` | `off` | `on` でスクロールの前にポインターの下のペインを選びます |
+| `@scroll_revamped_alt_keys` | なし | `arrow` か `page` で、マウスを使わない代替画面のアプリ（less、man、vi など）にホイールを矢印キーかページキーとして送ります。矢印モードは 1 回につき `@scroll_revamped_speed` 個のキーを送り、未設定なら 3、最大 20 です |
+| `@scroll_revamped_mouse` | `on` | `off` でプラグインは tmux の `mouse` オプションを変えません |
+| `@scroll_revamped_speed` | なし | コピーモードで 1 回にスクロールする行数。正の整数です |
+| `@scroll_revamped_granularity` | `line` | コピーモードで 1 回にスクロールする量。`line`、`halfpage`、`page` |
+| `@scroll_revamped_auto_exit` | `off` | `on` で、最下部にいるときの下向きのスクロールでコピーモードを抜けます |
+| `@scroll_revamped_indicator` | `off` | `on` でコピーモードのスクロールごとに位置（例 `scroll 120/4000`）を表示します |
+| `@scroll_revamped_drag_copy` | `off` | `on` でコピーモードのマウス選択をシステムのクリップボードにコピーします |
+| `@scroll_revamped_status_wheel` | `off` | `on` でステータスラインの上のホイールでウィンドウを切り替えます |
 
-```tmux
-set -g @scroll_revamped_wheel 'on'
-set -g @scroll_revamped_speed '3'
-set -g @scroll_revamped_auto_exit 'on'
-```
+どのオプションも、ダッシュ区切りのコマンドオプション（例 `--skip-empty on`）と環境変数（例 `SCROLL_REVAMPED_SKIP_EMPTY`）で指定できます。優先順位はコマンドライン、環境変数、tmux オプションの順です。空の tmux オプションは既定値を意味します。2 つの passthrough オプションをどちらも `off` にすると、ホイールは常にコピーモードに入ります。
 
-<a id="configuration"></a>
+<a id="判断のしかた"></a>
 
-## 設定
+## 判断のしかた
 
-オプションはプラグインを読み込む前に`~/.tmux.conf`で設定します。
-
-| オプション | 既定値 | 意味 |
-|:-------|:--------|:--------|
-| `@scroll_revamped_wheel` | `off` | `on`でホイールを振り分けるルートテーブルの`WheelUpPane`と`WheelDownPane`を割り当てます。`off`ではtmux自身のホイールのバインドがそのまま残ります |
-| `@scroll_revamped_passthrough_alternate` | `on` | 代替画面のアプリにホイールを渡します。`off`にすると、そのペインはコピーモードに入ります |
-| `@scroll_revamped_passthrough_mouse` | `on` | マウスレポートを有効にしたアプリにホイールを渡します。`off`にするとアプリのマウスモードを無視します |
-| `@scroll_revamped_skip_empty` | `off` | `on`にすると、スクロールバックのないペインではホイールでコピーモードに入りません |
-| `@scroll_revamped_select_pane` | `off` | `on`にすると、スクロールの前にポインターの下のペインを選択します |
-| `@scroll_revamped_alt_keys` | 未設定 | `arrow`または`page`にすると、less、man、viのようにマウスレポートを無効にした代替画面のアプリに対して、ホイールを矢印キーまたはページキーに変えます。arrowでは1回につき`@scroll_revamped_speed`個のキーを送ります。未設定なら3個で、最大20個です |
-| `@scroll_revamped_mouse` | `on` | `off`にすると、プラグインはtmuxの`mouse`オプションを設定しません |
-| `@scroll_revamped_speed` | 未設定 | 正の整数で、コピーモードのホイール1回でスクロールする行数を決めます |
-| `@scroll_revamped_granularity` | `line` | コピーモードのホイール1回で進む量です。`line`、`halfpage`、`page`のいずれかです |
-| `@scroll_revamped_auto_exit` | `off` | `on`にすると、すでに末尾にいるときの下向きの1回でコピーモードを抜けます |
-| `@scroll_revamped_indicator` | `off` | `on`にすると、コピーモードでのホイール1回ごとに`scroll 120/4000`のようなスクロール位置を一瞬表示します |
-| `@scroll_revamped_drag_copy` | `off` | `on`にすると、コピーモードでマウスで選択した範囲をシステムクリップボードにコピーします |
-| `@scroll_revamped_status_wheel` | `off` | `on`にすると、ステータス行の上でホイールを回してウィンドウを切り替えます |
-
-2つのpassthroughオプションを両方とも無効にすると、ホイールは常にコピーモードに入ります。
-
-### 内部状態
-
-以下のオプションはプラグインが自分で管理します。設定しないでください。
-
-| オプション | 内容 |
-|:-------|:------|
-| `@scroll_revamped_cache_key` | tmux 1.9の確認コマンドが最後に判定したときの、ペイン、代替画面、マウス、スクロールバックの状態です |
-| `@scroll_revamped_cache_val` | その判定です。`0`はアプリにホイールを渡し、`1`はコピーモードに入ります |
-
-<a id="key-bindings"></a>
-
-## キーバインド
-
-プラグインはプレフィックスキーを割り当てません。バインドはマウスのイベントで、それぞれオプションが設定されるまで割り当てません。
-
-| キー | テーブル | 割り当てる条件 |
-|:----|:------|:-----------|
-| `WheelUpPane`、`WheelDownPane` | root | `@scroll_revamped_wheel`が`on`のとき |
-| `WheelUpPane`、`WheelDownPane` | `copy-mode`、`copy-mode-vi` | `@scroll_revamped_speed`が設定されているか、`@scroll_revamped_granularity`が`line`以外か、`@scroll_revamped_auto_exit`または`@scroll_revamped_indicator`が`on`のとき |
-| `MouseDragEnd1Pane` | `copy-mode`、`copy-mode-vi` | `@scroll_revamped_drag_copy`が`on`で、クリップボードのツールが見つかったとき |
-| `WheelUpStatus`、`WheelDownStatus` | root | `@scroll_revamped_status_wheel`が`on`のとき |
-
-tmux-revampedファミリーではルートテーブルは利用者が選んで使うものなので、3.0.0からホイールのバインドは`@scroll_revamped_wheel`を待ちます。コピーモードのバインドは、ホイールの振り分けが有効かどうかに関係なく働きます。
-
-<a id="how-it-works"></a>
-
-## 仕組み
-
-**振り分け。** `WheelUpPane`は1つの条件を確かめます。ペインが代替画面にあるか、アプリがマウスレポートを有効にしているか、ペインがすでにモードに入っているかです。真なら、ホイールのイベントは`send-keys -M`でペインに送られます。偽なら、tmuxは`copy-mode -e`でコピーモードに入ります。このモードは末尾までスクロールして戻ると終了します。`WheelDownPane`は常にイベントを転送するので、アプリか開いているコピーモードをスクロールします。
-
-**1回ごとのフォークなし。** 条件は`if-shell -F`の中のtmuxの書式で、tmux自身が評価します。
+`WheelUpPane` は 1 つの条件を調べます。ペインが代替画面にあるか、アプリがマウスを求めたか、ペインがすでにモードにあるかです。成り立つときはホイールのイベントを `send-keys -M` でペインに送り、成り立たないときは `copy-mode -e` でコピーモードに入ります。このコピーモードは最下部まで戻ると抜けます。`WheelDownPane` は常にイベントを送るので、アプリか開いているコピーモードがスクロールします。
 
 | tmux | 振り分け |
 |:-----|:--------|
-| 3.1以降 | `#{\|\|:}`と`#{&&:}`の書式演算子 |
-| 2.0から3.0 | 同じ条件を入れ子の`#{?}`で組み立てます |
-| 1.9 | [`src/scroll.sh`](src/scroll.sh)の`check`が1回ごとに実行され、その答えをペインの状態ごとにキャッシュします |
+| 3.1 以降 | `#{\|\|:}` と `#{&&:}` の演算子を使う 1 つのフォーマット |
+| 2.0 から 3.0 | 同じ条件を入れ子の `#{?}` で組み立てます |
+| 1.9 | スクロールごとに `scroll-revamped check` を実行し、その答えをペインの状態ごとに `@scroll_revamped_cache_key` と `@scroll_revamped_cache_val` に保存します |
 
-**コピーモードの調整。** 速度、粒度、自動終了、位置の表示は、tmux 2.4以降で`copy-mode`と`copy-mode-vi`のテーブルのホイールを割り当て直します。位置の表示には、`display-message`が`-d`を受け付ける最初のリリースであるtmux 3.2が必要です。ステータス行のホイールにはtmux 2.1が必要です。
+速度、粒度、自動終了、位置表示は tmux 2.4 以降で `copy-mode` と `copy-mode-vi` のテーブルのホイールを割り当て直します。位置表示には tmux 3.2、ステータスラインのホイールには tmux 2.1 が必要です。
+
+<a id="画面"></a>
+
+## 画面
+
+<details>
+<summary>すべての画面。本物の tmux の中で <code>make screens</code> で録画し、各マウス操作と押したキーをステータスラインに表示しています</summary>
+<br>
+
+<table>
+<tr>
+<td width="50%" valign="top"><img src="screens/wheel-shell.png" alt="scroll-revamped: シェルの上のホイールはコピーモードに入って履歴をスクロールする"><br><sub>シェルの上のホイールはコピーモードに入って履歴をスクロールする。<code>hero.tape</code>より</sub></td>
+<td width="50%" valign="top"><img src="screens/wheel-less.png" alt="scroll-revamped: @scroll_revamped_alt_keys arrow で less は矢印キーでスクロールする"><br><sub><code>@scroll_revamped_alt_keys arrow</code> で less は矢印キーでスクロールする。<code>hero.tape</code>より</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/indicator.png" alt="scroll-revamped: @scroll_revamped_indicator がスクロール位置を表示する"><br><sub><code>@scroll_revamped_indicator</code> がスクロール位置を表示する。<code>hero.tape</code>より</sub></td>
+<td width="50%" valign="top"><img src="screens/status-wheel.png" alt="scroll-revamped: @scroll_revamped_status_wheel でステータスラインの上のホイールがウィンドウを切り替える"><br><sub><code>@scroll_revamped_status_wheel</code> でステータスラインの上のホイールがウィンドウを切り替える。<code>hero.tape</code>より</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/menu.png" alt="scroll-revamped: メニュー"><br><sub>メニュー。<code>stills.tape</code>より</sub></td>
+<td width="50%" valign="top"><img src="screens/doctor.png" alt="scroll-revamped: doctor"><br><sub><code>doctor</code>。<code>stills.tape</code>より</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/list.png" alt="scroll-revamped: list"><br><sub><code>list</code>。<code>stills.tape</code>より</sub></td>
+<td width="50%" valign="top"><img src="screens/json.png" alt="scroll-revamped: list --json"><br><sub><code>list --json</code>。<code>stills.tape</code>より</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/plain-menu.png" alt="scroll-revamped: gum なしのメニュー"><br><sub>gum なしのメニュー。<code>stills.tape</code>より</sub></td>
+<td width="50%" valign="top"><img src="screens/plain-apply.png" alt="scroll-revamped: メニューからの apply"><br><sub>メニューからの <code>apply</code>。<code>stills.tape</code>より</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/version.png" alt="scroll-revamped: バージョン"><br><sub>バージョン。<code>stills.tape</code>より</sub></td>
+<td width="50%" valign="top"><img src="screens/error.png" alt="scroll-revamped: 不明なコマンド"><br><sub>不明なコマンド。<code>stills.tape</code>より</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/themes.png" alt="scroll-revamped: 6 つのテーマのヘッダー"><br><sub>6 つのテーマのヘッダー。<code>themes.tape</code>より</sub></td>
+<td width="50%" valign="top"><img src="screens/help.png" alt="scroll-revamped: ヘルプ"><br><sub>ヘルプ。<code>help.tape</code>より</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/accent.png" alt="scroll-revamped: SCROLL_REVAMPED_ACCENT によるアクセント"><br><sub><code>SCROLL_REVAMPED_ACCENT</code> によるアクセント。<code>stills.tape</code>より</sub></td>
+<td width="50%" valign="top"></td>
+</tr>
+</table>
+
+</details>
+
+## 移植性
+
+プラグインは POSIX `sh` です。CI は下の各行ですべてのテストを実行します。
+
+| シェル | 状態 |
+|:------|:-------|
+| `dash`、macOS の `/bin/sh` | 対応 |
+| `bash` 3.2 と 5.x、システムの `zsh` と Homebrew の `zsh` | 対応 |
+
+| システム | 状態 |
+|:-------|:-------|
+| macOS | Apple Silicon と Intel の Tahoe。付属のツール、Homebrew の GNU ツール、Homebrew の uutils で確認 |
+| Linux | x86_64 と arm64 の Ubuntu 26.04。GNU coreutils、uutils、BusyBox で確認 |
 
 ## 開発
 
-| コマンド | 内容 |
+| コマンド | 実行内容 |
 |:--------|:-------------|
-| `make test` | batsのテストスイートを実行します |
-| `make lint` | すべてのシェルファイルにshellcheckを実行します |
-| `make coverage` | kcovで行カバレッジを測り、95パーセント未満なら失敗します。Linuxで動きます |
+| `make fmt` | すべてのスクリプトに shfmt `-i 2` をかけます |
+| `make lint` | shfmt、ShellCheck、mandoc、yamllint、actionlint を、指摘ゼロで通します |
+| `make test` | システムの `sh` で bats のテスト |
+| `make test-all` | インストール済みのすべてのシェルでテスト。macOS では bash と zsh の両方のビルドを含みます |
+| `make test-linux` | Ubuntu のコンテナでテスト |
+| `make coverage` | この Mac と Ubuntu のコンテナで bashcov を実行し、合算して 100 パーセントで判定します |
+| `make screens` | 上の画面を、本物のプラグインから tmux の中で VHS で録画します。macOS で実行します |
+| `make install` | コマンド、manページ、補完を `PREFIX` の下に置きます |
 
-バインドは[`src/lib/scroll/routing.sh`](src/lib/scroll/routing.sh)で、すべてのtmuxコマンドを発行する1つの関数を通して組み立てられるので、テストは稼働中のtmuxサーバーなしで各バインドを確認できます。
+コミットは Conventional Commits の形式に従い、そのまま `main` に入ります。`main` で `ci` が成功すると、`release.yml` が semantic-release を実行します。前回のタグ以降に `feat` か `fix` があればリリースを公開し、バージョン定数を更新し、変更内容を [`CHANGELOG.md`](CHANGELOG.md) に追加します。
 
 ## ライセンス
 
-[MIT](LICENSE)
+[MIT](LICENSE)、copyright Gustavo Franco。
 
 <!-- family:begin -->
 

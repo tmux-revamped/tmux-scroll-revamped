@@ -2,63 +2,59 @@
 
 # tmux-scroll-revamped
 
-<strong>将鼠标滚轮交给能自行滚动的应用，其他情况下进入 tmux 复制模式。</strong>
+<strong>把鼠标滚轮交给会自己滚动的应用，其他情况进入 tmux 复制模式。</strong>
 
-[English](README.md) | [日本語](README.ja.md) | 简体中文 | [繁體中文（香港）](README.zh-HK.md)
+[English](README.md) &nbsp;|&nbsp; [日本語](README.ja.md) &nbsp;|&nbsp; 简体中文 &nbsp;|&nbsp; [繁體中文（香港）](README.zh-HK.md)
 
-[![family](https://img.shields.io/github/actions/workflow/status/tmux-revamped/tmux-scroll-revamped/family.yml?branch=main&style=flat-square&label=family)](https://github.com/tmux-revamped/tmux-scroll-revamped/actions/workflows/family.yml)
-[![tests](https://img.shields.io/github/actions/workflow/status/tmux-revamped/tmux-scroll-revamped/tests.yml?branch=main&style=flat-square&label=tests)](https://github.com/tmux-revamped/tmux-scroll-revamped/actions/workflows/tests.yml)
+[![ci](https://img.shields.io/github/actions/workflow/status/tmux-revamped/tmux-scroll-revamped/ci.yml?branch=main&style=flat-square&label=ci)](https://github.com/tmux-revamped/tmux-scroll-revamped/actions/workflows/ci.yml)
 [![release](https://img.shields.io/github/v/release/tmux-revamped/tmux-scroll-revamped?style=flat-square&label=release)](https://github.com/tmux-revamped/tmux-scroll-revamped/releases/latest)
 [![openssf scorecard](https://img.shields.io/ossf-scorecard/github.com/tmux-revamped/tmux-scroll-revamped?style=flat-square&label=openssf%20scorecard)](https://scorecard.dev/viewer/?uri=github.com/tmux-revamped/tmux-scroll-revamped)
 [![license](https://img.shields.io/github/license/tmux-revamped/tmux-scroll-revamped?style=flat-square&label=license)](LICENSE)
 
 <p align="center">
-  <a href="#what-it-does">功能</a> |
-  <a href="#installation">安装</a> |
-  <a href="#usage">用法</a> |
-  <a href="#configuration">配置</a> |
-  <a href="#key-bindings">按键绑定</a> |
-  <a href="#how-it-works">工作原理</a>
+  <a href="#快速开始"><strong>快速开始</strong></a> &nbsp;|&nbsp;
+  <a href="#用法">用法</a> &nbsp;|&nbsp;
+  <a href="#判断方式">判断方式</a> &nbsp;|&nbsp;
+  <a href="#界面">界面</a>
 </p>
 
 </div>
 
-**在 tmux 2.0 及更高版本上，每次滚轮滚动派生 0 个进程。需要配置的应用名为 0 个。13 个选项。已在 macOS 和 Linux 上测试。**
+<p align="center">
+  <img src="screens/hero.gif" alt="scroll-revamped 把滚轮送进 shell 的复制模式和 less，闪示位置并切换窗口" width="800">
+</p>
+
+```console
+$ scroll-revamped --wheel on list
+set-option -g mouse on
+bind-key -n WheelUpPane if-shell -F "#{?#{||:#{alternate_on},#{||:#{mouse_any_flag},#{pane_in_mode}}},1,0}" "send-keys -M" "copy-mode -e ; send-keys -M"
+bind-key -n WheelDownPane send-keys -M
+```
+
+vim、less、htop 或 Claude Code 等在备用屏幕上运行的全屏应用会收到滚轮，请求了鼠标的应用也会收到。在 shell 提示符上，滚轮进入复制模式并滚动 tmux 历史。判断由 tmux 格式完成，因此不用列出应用名，每次滚动也不会启动进程。
 
 ---
 
-<a id="what-it-does"></a>
+## 快速开始
 
-## 功能
+### 前提条件
 
-运行在备用屏幕上的全屏应用，例如 vim、less、htop 或 Claude Code，会收到滚轮事件。开启了鼠标报告的应用也一样。在 shell 提示符上，滚轮会进入复制模式并滚动 tmux 历史。判断只读取两个 tmux 格式 `#{alternate_on}` 和 `#{mouse_any_flag}`，所以不需要列出任何应用名。
+| 工具 | 版本 | 用途 |
+|:-----|:--------|:---------|
+| tmux | 3.2 或更高 | 家族的最低版本；在 tmux 1.9 到 3.1 上也能用判断方式中的后备方案生成绑定 |
+| 剪贴板工具 | 可选 | 用于 `@scroll_revamped_drag_copy`：macOS 上的 `pbcopy`，Linux 上的 `wl-copy`、`xclip` 或 `xsel` |
+| gum | 可选 | `scroll-revamped` 的菜单、表格和颜色；没有它，所有命令都输出纯文本 |
 
-可选设置可以调整复制模式下的滚动：每次滚动的行数、按半页或整页滚动、到底部时退出复制模式、闪现滚动位置，以及把鼠标选区复制到系统剪贴板。
-
-## 环境要求
-
-| 项目 | 版本或说明 |
-|:------------|:----------------|
-| tmux | 3.2 或更高版本。借助[工作原理](#how-it-works)中的回退方式，绑定也能在 tmux 1.9 到 3.1 上构建 |
-| bash | 3.2 或更高版本，因此 macOS 自带的 `/bin/bash` 可以使用 |
-| 操作系统 | Apple Silicon 和 Intel 上的 macOS，x86_64 和 arm64 上的 Linux |
-| 核心工具 | BSD、GNU 或 uutils coreutils |
-| 剪贴板工具 | 可选，用于 `@scroll_revamped_drag_copy`：macOS 上为 `pbcopy`，Linux 上为 `wl-copy`、`xclip` 或 `xsel` |
-
-<a id="installation"></a>
-
-## 安装
-
-使用 [TPM](https://github.com/tmux-plugins/tpm) 时，把插件加入 `~/.tmux.conf`，打开滚轮分流，然后按 `prefix + I`：
+### 安装
 
 ```tmux
 set -g @plugin 'tmux-revamped/tmux-scroll-revamped'
 set -g @scroll_revamped_wheel 'on'
 ```
 
-不使用 TPM 时，克隆仓库，并在 `~/.tmux.conf` 中运行入口脚本：
+然后按 `prefix + I`。不用 TPM 时，克隆仓库，并在 `~/.tmux.conf` 中运行它的入口文件：
 
-```sh
+```bash
 git clone https://github.com/tmux-revamped/tmux-scroll-revamped ~/.tmux/plugins/tmux-scroll-revamped
 ```
 
@@ -66,99 +62,137 @@ git clone https://github.com/tmux-revamped/tmux-scroll-revamped ~/.tmux/plugins/
 run-shell ~/.tmux/plugins/tmux-scroll-revamped/scroll-revamped.tmux
 ```
 
-<a id="usage"></a>
+在克隆的目录中运行 `make install`，还会把 `scroll-revamped` 放进 `~/.local/bin`，把它的 man 手册和补全放在 `~/.local/share` 下。
+
+### 验证
+
+```bash
+~/.tmux/plugins/tmux-scroll-revamped/bin/scroll-revamped doctor
+```
 
 ## 用法
 
-打开 `@scroll_revamped_wheel` 后直接滚动即可。在 vim、less、htop 或全屏 TUI 上，滚轮滚动应用本身。在 shell 提示符上，它滚动 tmux 历史。不需要按任何键。
-
-插件在加载时还会打开 tmux 的 `mouse` 选项。要自己管理这个选项，把 `@scroll_revamped_mouse` 设为 `off`。
-
-每次滚动 3 行并在到底部时退出复制模式的配置：
-
-```tmux
-set -g @scroll_revamped_wheel 'on'
-set -g @scroll_revamped_speed '3'
-set -g @scroll_revamped_auto_exit 'on'
-```
-
-<a id="configuration"></a>
-
-## 配置
-
-在插件加载之前于 `~/.tmux.conf` 中设置选项。
-
-| 选项 | 默认值 | 含义 |
-|:-------|:--------|:--------|
-| `@scroll_revamped_wheel` | `off` | `on` 绑定根表中用于分流滚轮的 `WheelUpPane` 和 `WheelDownPane`。`off` 保留 tmux 自带的滚轮绑定 |
-| `@scroll_revamped_passthrough_alternate` | `on` | 把滚轮交给备用屏幕上的应用。`off` 让这些窗格进入复制模式 |
-| `@scroll_revamped_passthrough_mouse` | `on` | 把滚轮交给开启了鼠标报告的应用。`off` 忽略应用的鼠标模式 |
-| `@scroll_revamped_skip_empty` | `off` | `on` 时，没有回滚内容的窗格不会因滚轮进入复制模式 |
-| `@scroll_revamped_select_pane` | `off` | `on` 时，滚动前先选中指针下方的窗格 |
-| `@scroll_revamped_alt_keys` | 未设置 | `arrow` 或 `page` 会把滚轮转换为方向键或翻页键，发给关闭了鼠标报告的备用屏幕应用，例如 less、man 或 vi。arrow 模式每次发送 `@scroll_revamped_speed` 个按键，未设置时为 3 个，最多 20 个 |
-| `@scroll_revamped_mouse` | `on` | `off` 时插件不设置 tmux 的 `mouse` 选项 |
-| `@scroll_revamped_speed` | 未设置 | 正整数，设置复制模式下每次滚轮滚动的行数 |
-| `@scroll_revamped_granularity` | `line` | 复制模式下每次滚动的距离：`line`、`halfpage` 或 `page` |
-| `@scroll_revamped_auto_exit` | `off` | `on` 时，已经在底部时再向下滚动一次会退出复制模式 |
-| `@scroll_revamped_indicator` | `off` | `on` 时，复制模式下每次滚动都会闪现滚动位置，例如 `scroll 120/4000` |
-| `@scroll_revamped_drag_copy` | `off` | `on` 时，把复制模式中的鼠标选区复制到系统剪贴板 |
-| `@scroll_revamped_status_wheel` | `off` | `on` 时，在状态栏上滚动滚轮会切换窗口 |
-
-两个 passthrough 选项都关闭时，滚轮总是进入复制模式。
-
-### 内部状态
-
-以下选项由插件自行管理，请勿设置。
-
-| 选项 | 内容 |
-|:-------|:------|
-| `@scroll_revamped_cache_key` | tmux 1.9 检查命令最近一次判断时的窗格、备用屏幕、鼠标和回滚状态 |
-| `@scroll_revamped_cache_val` | 那次判断的结果：`0` 把滚轮交给应用，`1` 进入复制模式 |
-
-<a id="key-bindings"></a>
-
-## 按键绑定
-
-插件不绑定任何前缀键。它的绑定都是鼠标事件，每一个都要等到对应选项设置后才绑定。
-
-| 按键 | 表 | 绑定条件 |
-|:----|:------|:-----------|
-| `WheelUpPane`、`WheelDownPane` | root | `@scroll_revamped_wheel` 为 `on` |
-| `WheelUpPane`、`WheelDownPane` | `copy-mode`、`copy-mode-vi` | 设置了 `@scroll_revamped_speed`，或 `@scroll_revamped_granularity` 不是 `line`，或 `@scroll_revamped_auto_exit` 或 `@scroll_revamped_indicator` 为 `on` |
-| `MouseDragEnd1Pane` | `copy-mode`、`copy-mode-vi` | `@scroll_revamped_drag_copy` 为 `on` 且找到了剪贴板工具 |
-| `WheelUpStatus`、`WheelDownStatus` | root | `@scroll_revamped_status_wheel` 为 `on` |
-
-在 tmux-revamped 家族中，根表由用户自行选择启用，因此从 3.0.0 起滚轮绑定要等 `@scroll_revamped_wheel` 打开。无论滚轮分流是否打开，复制模式绑定都能工作。
-
-<a id="how-it-works"></a>
-
-## 工作原理
-
-**分流。** `WheelUpPane` 检查一个条件：窗格处于备用屏幕，或其应用开启了鼠标报告，或窗格已经处于某种模式。条件为真时，滚轮事件用 `send-keys -M` 发给窗格。条件为假时，tmux 用 `copy-mode -e` 进入复制模式，滚回底部时这个模式会自动退出。`WheelDownPane` 总是转发事件，因此它滚动应用或已打开的复制模式。
-
-**每次滚动不派生进程。** 条件是放在 `if-shell -F` 中的 tmux 格式，由 tmux 自己求值。
-
-| tmux | 分流方式 |
-|:-----|:--------|
-| 3.1 及更高版本 | `#{\|\|:}` 和 `#{&&:}` 格式运算符 |
-| 2.0 到 3.0 | 用嵌套的 `#{?}` 构建同样的条件 |
-| 1.9 | 每次滚动都运行 [`src/scroll.sh`](src/scroll.sh) 的 `check`，其结果按窗格状态缓存 |
-
-**复制模式调整。** 速度、粒度、自动退出和位置提示会在 tmux 2.4 及更高版本上重新绑定 `copy-mode` 和 `copy-mode-vi` 表中的滚轮。位置提示需要 tmux 3.2，这是 `display-message` 首个接受 `-d` 的版本。状态栏滚轮需要 tmux 2.1。
-
-## 开发
+打开 `@scroll_revamped_wheel` 后直接滚动：在 vim、less、htop 等全屏应用上滚动的是应用，在 shell 提示符上滚动的是 tmux 历史。插件还会打开 tmux 的 `mouse` 选项；想自己管理时把 `@scroll_revamped_mouse` 设为 `off`。
 
 | 命令 | 作用 |
 |:--------|:-------------|
-| `make test` | 运行 bats 测试套件 |
-| `make lint` | 对所有 shell 文件运行 shellcheck |
-| `make coverage` | 用 kcov 测量行覆盖率，低于 95% 时失败，在 Linux 上运行 |
+| `scroll-revamped apply` | 立即绑定滚轮；插件加载时入口点会运行它 |
+| `scroll-revamped list` | 打印 apply 会做的每个绑定；`--json` 输出一个对象 |
+| `scroll-revamped check ALT MOUSE HISTORY PANE` | 在 tmux 2.0 之前判断一次滚动：交给应用时以 0 退出，进入复制模式时以 1 退出 |
+| `scroll-revamped doctor` | 每个依赖一行，包括剪贴板工具 |
+| `scroll-revamped version` | 版本，然后是 tmux 版本 |
+| `scroll-revamped help` | 帮助页；`man scroll-revamped` 记录相同的命令和设置 |
+| `scroll-revamped` | 在终端上显示菜单 |
 
-绑定在 [`src/lib/scroll/routing.sh`](src/lib/scroll/routing.sh) 中通过一个发出所有 tmux 命令的函数构建，因此测试无需运行中的 tmux 服务器就能检查每个绑定。
+| tmux 选项 | 默认值 | 含义 |
+|:------------|:--------|:--------|
+| `@scroll_revamped_wheel` | `off` | `on` 绑定负责分配滚轮的根表 `WheelUpPane` 和 `WheelDownPane`；`off` 保留 tmux 自己的滚轮 |
+| `@scroll_revamped_passthrough_alternate` | `on` | 把滚轮交给备用屏幕上的应用；`off` 时这些窗格也进入复制模式 |
+| `@scroll_revamped_passthrough_mouse` | `on` | 把滚轮交给请求了鼠标的应用 |
+| `@scroll_revamped_skip_empty` | `off` | `on` 时没有历史的窗格不进入复制模式 |
+| `@scroll_revamped_select_pane` | `off` | `on` 时滚动前先选中指针下的窗格 |
+| `@scroll_revamped_alt_keys` | 无 | `arrow` 或 `page` 把滚轮变成方向键或翻页键，交给关闭了鼠标的备用屏幕应用，例如 less、man 或 vi；方向键模式每次发送 `@scroll_revamped_speed` 个键，未设置时为 3，最多 20 |
+| `@scroll_revamped_mouse` | `on` | `off` 时插件不设置 tmux 的 `mouse` 选项 |
+| `@scroll_revamped_speed` | 无 | 复制模式中每次滚动的行数，为正整数 |
+| `@scroll_revamped_granularity` | `line` | 复制模式中每次滚动的幅度：`line`、`halfpage` 或 `page` |
+| `@scroll_revamped_auto_exit` | `off` | `on` 时在底部向下滚动会离开复制模式 |
+| `@scroll_revamped_indicator` | `off` | `on` 时每次复制模式滚动都闪示位置，例如 `scroll 120/4000` |
+| `@scroll_revamped_drag_copy` | `off` | `on` 时把复制模式中的鼠标选区复制到系统剪贴板 |
+| `@scroll_revamped_status_wheel` | `off` | `on` 时在状态栏上滚动滚轮会切换窗口 |
+
+每个选项也可以写成用短横线连接的命令选项，例如 `--skip-empty on`，以及环境变量，例如 `SCROLL_REVAMPED_SKIP_EMPTY`；命令行优先于环境变量，环境变量优先于 tmux 选项。空的 tmux 选项表示使用默认值。两个 passthrough 选项都为 `off` 时，滚轮总是进入复制模式。
+
+<a id="判断方式"></a>
+
+## 判断方式
+
+`WheelUpPane` 只检查一个条件：窗格在备用屏幕上，或其应用请求了鼠标，或窗格已处于某种模式。条件成立时，滚轮事件用 `send-keys -M` 交给窗格；否则 tmux 用 `copy-mode -e` 进入复制模式，滚回底部时会自动离开。`WheelDownPane` 总是转发事件，因此滚动的是应用或已打开的复制模式。
+
+| tmux | 分配方式 |
+|:-----|:--------|
+| 3.1 及以后 | 使用 `#{\|\|:}` 和 `#{&&:}` 运算符的单个格式 |
+| 2.0 到 3.0 | 用嵌套的 `#{?}` 组成同一个条件 |
+| 1.9 | 每次滚动都运行 `scroll-revamped check`，并按窗格状态把结果缓存在 `@scroll_revamped_cache_key` 和 `@scroll_revamped_cache_val` 中 |
+
+速度、幅度、自动离开和位置提示在 tmux 2.4 及以后重新绑定 `copy-mode` 和 `copy-mode-vi` 表中的滚轮；位置提示需要 tmux 3.2，状态栏滚轮需要 tmux 2.1。
+
+<a id="界面"></a>
+
+## 界面
+
+<details>
+<summary>所有界面，在真实的 tmux 中用 <code>make screens</code> 录制，每个鼠标手势和按键显示在状态栏上</summary>
+<br>
+
+<table>
+<tr>
+<td width="50%" valign="top"><img src="screens/wheel-shell.png" alt="scroll-revamped：在 shell 上滚动滚轮会进入复制模式并滚动历史"><br><sub>在 shell 上滚动滚轮会进入复制模式并滚动历史，来自 <code>hero.tape</code></sub></td>
+<td width="50%" valign="top"><img src="screens/wheel-less.png" alt="scroll-revamped：@scroll_revamped_alt_keys arrow 让 less 用方向键滚动"><br><sub><code>@scroll_revamped_alt_keys arrow</code> 让 less 用方向键滚动，来自 <code>hero.tape</code></sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/indicator.png" alt="scroll-revamped：@scroll_revamped_indicator 闪示滚动位置"><br><sub><code>@scroll_revamped_indicator</code> 闪示滚动位置，来自 <code>hero.tape</code></sub></td>
+<td width="50%" valign="top"><img src="screens/status-wheel.png" alt="scroll-revamped：@scroll_revamped_status_wheel 让状态栏上的滚轮切换窗口"><br><sub><code>@scroll_revamped_status_wheel</code> 让状态栏上的滚轮切换窗口，来自 <code>hero.tape</code></sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/menu.png" alt="scroll-revamped：菜单"><br><sub>菜单，来自 <code>stills.tape</code></sub></td>
+<td width="50%" valign="top"><img src="screens/doctor.png" alt="scroll-revamped：doctor"><br><sub><code>doctor</code>，来自 <code>stills.tape</code></sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/list.png" alt="scroll-revamped：list"><br><sub><code>list</code>，来自 <code>stills.tape</code></sub></td>
+<td width="50%" valign="top"><img src="screens/json.png" alt="scroll-revamped：list --json"><br><sub><code>list --json</code>，来自 <code>stills.tape</code></sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/plain-menu.png" alt="scroll-revamped：没有 gum 的菜单"><br><sub>没有 gum 的菜单，来自 <code>stills.tape</code></sub></td>
+<td width="50%" valign="top"><img src="screens/plain-apply.png" alt="scroll-revamped：从菜单运行 apply"><br><sub>从菜单运行 <code>apply</code>，来自 <code>stills.tape</code></sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/version.png" alt="scroll-revamped：版本"><br><sub>版本，来自 <code>stills.tape</code></sub></td>
+<td width="50%" valign="top"><img src="screens/error.png" alt="scroll-revamped：未知命令"><br><sub>未知命令，来自 <code>stills.tape</code></sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/themes.png" alt="scroll-revamped：六种主题下的标题"><br><sub>六种主题下的标题，来自 <code>themes.tape</code></sub></td>
+<td width="50%" valign="top"><img src="screens/help.png" alt="scroll-revamped：帮助页"><br><sub>帮助页，来自 <code>help.tape</code></sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/accent.png" alt="scroll-revamped：来自 SCROLL_REVAMPED_ACCENT 的强调色"><br><sub>来自 <code>SCROLL_REVAMPED_ACCENT</code> 的强调色，来自 <code>stills.tape</code></sub></td>
+<td width="50%" valign="top"></td>
+</tr>
+</table>
+
+</details>
+
+## 可移植性
+
+插件是 POSIX `sh`。CI 在下面每一行上运行全部测试。
+
+| Shell | 状态 |
+|:------|:-------|
+| `dash`、macOS 上的 `/bin/sh` | 支持 |
+| `bash` 3.2 和 5.x、系统自带的 `zsh` 和 Homebrew 的 `zsh` | 支持 |
+
+| 系统 | 状态 |
+|:-------|:-------|
+| macOS | Apple Silicon 和 Intel 上的 Tahoe，使用系统自带的工具、Homebrew 的 GNU 工具和 Homebrew 的 uutils |
+| Linux | x86_64 和 arm64 上的 Ubuntu 26.04，使用 GNU coreutils、uutils 和 BusyBox |
+
+## 开发
+
+| 命令 | 运行内容 |
+|:--------|:-------------|
+| `make fmt` | 对每个脚本运行 shfmt `-i 2` |
+| `make lint` | shfmt、ShellCheck、mandoc、yamllint 和 actionlint，零告警 |
+| `make test` | 在系统 `sh` 下运行 bats 测试 |
+| `make test-all` | 在每个已安装的 shell 下运行测试，macOS 上包括 bash 和 zsh 的两种构建 |
+| `make test-linux` | 在 Ubuntu 容器中运行测试 |
+| `make coverage` | 在这台 Mac 和 Ubuntu 容器中运行 bashcov，合并后以 100% 为门槛 |
+| `make screens` | 用 VHS 在 tmux 中从真实插件录制上面的界面，在 macOS 上运行 |
+| `make install` | 把命令、man 手册和补全安装到 `PREFIX` 下 |
+
+提交遵循 Conventional Commits 格式，直接进入 `main`。`main` 上的 `ci` 通过后，`release.yml` 运行 semantic-release：自上一个标签以来的每个 `feat` 或 `fix` 都会发布新版本，更新版本常量，并把说明写进 [`CHANGELOG.md`](CHANGELOG.md)。
 
 ## 许可证
 
-[MIT](LICENSE)
+[MIT](LICENSE)，copyright Gustavo Franco。
 
 <!-- family:begin -->
 

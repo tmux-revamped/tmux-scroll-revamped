@@ -8,52 +8,43 @@ Guidance for anyone, human or agent, changing tmux-scroll-revamped. What it is a
 
 | Path | Holds |
 |:-----|:------|
-| [`scroll-revamped.tmux`](scroll-revamped.tmux) | The entry point TPM runs |
-| [`src/scroll.sh`](src/scroll.sh) | The script the entry point and the keys call |
-| [`src/lib/scroll/`](src/lib/scroll) | This member's modules |
-| [`src/lib/utils/constants.sh`](src/lib/utils/constants.sh) | This member's constants, including its version |
-| [`src/lib/utils/`](src/lib/utils), [`src/lib/tmux/`](src/lib/tmux) | The shared library. Every file there except `constants.sh` is identical in every member |
-| [`test/`](test) | The bats suite. `helpers.bash` and `tmux_helpers.bash` are identical in every member; this member's own mocks go in the `_local` files |
+| [`scroll-revamped.tmux`](scroll-revamped.tmux) | The entry point TPM runs: it runs `bin/scroll-revamped apply` |
+| [`bin/scroll-revamped`](bin/scroll-revamped) | The command: `apply`, `list`, `check`, `doctor`, `version`, `help` and the menu. `apply` and `check` run without loading the interface modules |
+| [`lib/scroll.sh`](lib/scroll.sh) | Reading the settings, the version checks, the binding plan and the `check` decision with its cache |
+| [`lib/state.sh`](lib/state.sh) | Every global, including `SCROLL_REVAMPED_SETTINGS`, the table of setting names and defaults the rest reads |
+| [`lib/core.sh`](lib/core.sh) | The version |
+| [`lib/`](lib) | Every other file is the shared library, identical in every member |
+| [`test/scroll.bats`](test/scroll.bats), [`test/commands.bats`](test/commands.bats), [`test/entrypoint.bats`](test/entrypoint.bats) | This member's suites: the library, the commands, and the entry point and `check` on a private tmux server |
+| [`screens/`](screens) | The tapes and the recording's tmux config, which turns the wheel routing on and puts the status line on top; the hero tape sends real wheel events as typed SGR mouse sequences |
 
 ## Names
 
-- Settings are tmux options named `@scroll_revamped_<setting>`.
+- Settings are the tmux options `@scroll_revamped_<setting>` listed in `SCROLL_REVAMPED_SETTINGS`, the long options with dashes, such as `--skip-empty`, and the environment variables `SCROLL_REVAMPED_<SETTING>`.
+- `@scroll_revamped_cache_key` and `@scroll_revamped_cache_val` hold the last `check` decision; they are state, never settings.
 - It has no status placeholders.
-- Public functions carry `scroll_`; private ones start with `_`.
 - The version constant is `SCROLL_REVAMPED_VERSION`.
-- Its command-line tool, once it exists, is `scroll-revamped`.
 
 ## Behaviour
 
-- Sends the mouse wheel to apps that scroll themselves and into copy-mode everywhere else.
-- It binds the mouse wheel in the root, `copy-mode` and `copy-mode-vi` tables.
-- `WheelUpPane` sends the event to the pane with `send-keys -M` when the pane is on the alternate screen, its app turned on mouse reporting, or it is already in a mode, and enters copy-mode with `copy-mode -e` otherwise.
+- `apply` reads every setting with one `tmux display-message` call and one `env` read, builds the plan, and sends every command to tmux in one call separated by `;`. Nothing runs in the background afterwards.
+- An empty tmux option means its default.
+- The entry point clears every inherited `REVAMPED_` variable except the test switches, and every `SCROLL_REVAMPED_*_LOADED` guard; every other global is assigned outright in the state module.
+- It binds no prefix key; it owns the root-table wheel keys, declared in the family key allocation, and only when `@scroll_revamped_wheel` is on.
 
 ## Domain rules
 
-- The condition is a tmux format inside `if-shell -F`, evaluated by tmux, so no process starts per wheel tick: `#{||:}` and `#{&&:}` on tmux 3.1 and later, nested `#{?}` on 2.0 to 3.0.
-- On tmux 1.9 `src/scroll.sh check` runs on each tick and caches its answer per pane state.
-- The copy-mode indicator needs tmux 3.2, the first release whose `display-message` accepts `-d`.
+- On tmux 2.0 and later the wheel is decided by a format inside `if-shell -F`, so no process starts per tick: native `#{||:}` and `#{&&:}` on 3.1 and later, nested `#{?}` below.
+- On tmux 1.9 each tick runs `check` with the pane's alternate, mouse and history flags; a flag an option turns off is passed as a constant, and the decision is cached per pane state in one `display-message` read and one `set-option` write.
+- The tool path in the 1.9 binding is quoted for `sh`, then escaped for a tmux double-quoted string, with `#` doubled, so a checkout path with a space, a quote or a hash survives.
+- Arrow alt keys repeat the key `@scroll_revamped_speed` times, 3 when unset, capped at 20 by length before the value is compared, so a huge number never overflows the shell. Alt keys need tmux 2.0.
+- Copy-mode tuning binds both copy-mode tables on tmux 2.4 and later; the indicator needs 3.2 and the status-line wheel 2.1.
+- Drag copy uses `pbcopy` on macOS, then `wl-copy`, `xclip` and `xsel`, and binds nothing when none exists; `doctor` names the one it would use.
 
 ## Release
 
-- `SCROLL_REVAMPED_VERSION` in [`src/lib/utils/constants.sh`](src/lib/utils/constants.sh) holds the version. It must equal the newest versioned heading in [`CHANGELOG.md`](CHANGELOG.md) and the README's version badge, which the `version` job in `tests.yml` checks.
-- A push to `main` whose version has no tag yet makes the `release` job in `tests.yml` tag `vX.Y.Z` and publish a GitHub release with that changelog section.
-- Unreleased changes sit under `## [Unreleased]` in [`CHANGELOG.md`](CHANGELOG.md) until a release is cut.
+- `SCROLL_REVAMPED_VERSION` in [`lib/core.sh`](lib/core.sh) holds the version. Nobody edits it by hand.
+- After a green `ci` run on `main`, [`release.yml`](.github/workflows/release.yml) runs semantic-release: a `feat` or `fix` since the last tag publishes a release, [`set-version.sh`](.github/scripts/set-version.sh) stamps the constant, and the notes go into [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Gaps against FAMILY.md
 
-As of 2026-11-15:
-
-- Every script is bash, under `#!/usr/bin/env bash`, not POSIX `sh`, so it is untested under `dash`, `zsh` and BusyBox `sh`.
-- The code lives in [`src/`](src) and [`src/lib/`](src/lib); there is no `bin/scroll-revamped`, `lib/state.sh` or `lib/core.sh`.
-- No `scroll-revamped` command with `help`, `version` and `doctor` in the family's form, no man page, no completions and no `manifest.json`.
-- No gum interface: no `lib/ui.sh`, `lib/table.awk`, themes or `test/bin/gum`.
-- No `screens/`: no VHS recording of each feature, no on-screen caption of the keys each recording presses, and no recordings in the README.
-- The README sections are not the family's order of Quick start, Usage, topic sections, Portability, Development and License.
-- Coverage is kcov with a 95 percent floor on Linux, not bashcov at 100 percent merged from macOS and Linux.
-- CI tests GNU, BSD and uutils tools in `tests.yml`, but not the six toolsets through `.github/scripts/toolset.sh`, and no shell matrix under `sh`, `dash`, `bash` and `zsh`.
-- No golden transcripts, `call.sh`, `run-matrix.sh` or `linux-container.sh`.
-- The version is written by hand and released by `tests.yml`; there is no semantic-release, `package.json`, `release.yml` with `recover`, `bot-merge.yml` or Renovate.
-- CI is `tests.yml` and `security.yml`, not `ci.yml`, and no job starts with `step-security/harden-runner`.
-- No `.editorconfig`, `.yamllint.yml` or shfmt; the Makefile has `help`, `test`, `test-unit`, `coverage`, `lint` and `clean`, not the family's targets.
+As of 2026-11-16, none.

@@ -1,0 +1,3 @@
+$ scroll-revamped
+scroll-revamped: no command given. run 'scroll-revamped help' for usage.
+exit 1

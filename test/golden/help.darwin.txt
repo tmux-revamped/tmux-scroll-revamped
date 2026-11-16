@@ -1,0 +1,65 @@
+$ scroll-revamped help
+scroll-revamped - the mouse wheel to apps that scroll, copy-mode for the rest
+
+usage:
+  scroll-revamped apply     bind the wheel now
+  scroll-revamped list      print every binding apply would make
+  scroll-revamped check ALT MOUSE HISTORY PANE
+                            decide one wheel tick on tmux before 2.0: exits 0
+                            to pass it to the app, 1 to enter copy-mode
+  scroll-revamped doctor    check this machine
+  scroll-revamped version   print the version
+  scroll-revamped help      print this page
+
+options:
+  --json           list prints one JSON object
+  --theme NAME     the look: kodougu, catppuccin-mocha, catppuccin-latte,
+                   dracula, nord, gruvbox, tokyo-night or mono
+  --SETTING VALUE  any tmux option below, named with dashes, such as
+                   --wheel on or --speed 3
+
+environment:
+  SCROLL_REVAMPED_SETTING  any tmux option below in capitals, such as
+                           SCROLL_REVAMPED_WHEEL
+  SCROLL_REVAMPED_THEME    the look, when --theme is not given
+  SCROLL_REVAMPED_ACCENT   a colour such as #CBA6F7 for the accent
+  KODOUGU_THEME            the family look, when neither is given
+  KODOUGU_ACCENT           the family accent, when the tool's is unset
+  NO_COLOR                 turn colour off
+
+tmux options:
+  @scroll_revamped_wheel                  on routes the wheel (off)
+  @scroll_revamped_passthrough_alternate  pass the wheel to an app on the
+                                          alternate screen (on)
+  @scroll_revamped_passthrough_mouse      pass the wheel to an app that asked
+                                          for the mouse (on)
+  @scroll_revamped_skip_empty             on keeps a pane with no scrollback
+                                          out of copy-mode (off)
+  @scroll_revamped_select_pane            on focuses the pane under the
+                                          pointer first (off)
+  @scroll_revamped_alt_keys               arrow or page sends keys to a full
+                                          screen app without mouse (none)
+  @scroll_revamped_mouse                  off leaves tmux's mouse option
+                                          alone (on)
+  @scroll_revamped_speed                  lines per copy-mode tick (none)
+  @scroll_revamped_granularity            line, halfpage or page (line)
+  @scroll_revamped_auto_exit              on leaves copy-mode at the bottom
+                                          (off)
+  @scroll_revamped_indicator              on flashes the scroll position (off)
+  @scroll_revamped_drag_copy              on copies a mouse selection to the
+                                          clipboard (off)
+  @scroll_revamped_status_wheel           on switches windows over the status
+                                          line (off)
+  @revamped_theme                         the family look (kodougu)
+
+notes:
+  The entry point runs apply once when tmux loads the plugin, and every
+  binding goes to tmux in one call. On tmux 2.0 and later the wheel is decided
+  by a format with no process; before 2.0 each tick runs check, which caches
+  its last decision in @scroll_revamped_cache_key and _cache_val.
+
+examples:
+  scroll-revamped list
+  scroll-revamped --wheel on --speed 3 apply
+  scroll-revamped doctor
+exit 0

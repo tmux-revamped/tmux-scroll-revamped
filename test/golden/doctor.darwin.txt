@@ -1,0 +1,8 @@
+$ scroll-revamped doctor
+tmux               ok       <path>, 3.8
+clipboard          warn     drag copy needs pbcopy, wl-copy, xclip or xsel
+gum                ok       <path>
+awk                ok       <path>, <flavor>
+sed                ok       <path>, <flavor>
+tr                 ok       <path>, <flavor>
+exit 0
