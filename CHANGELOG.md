@@ -1,5 +1,22 @@
 # Changelog
 
+# [3.1.0](https://github.com/tmux-revamped/tmux-scroll-revamped/compare/v3.0.0...v3.1.0) (2026-11-16)
+
+
+### Bug Fixes
+
+* **family:** fail when git cannot read a mode ([ea5a9e9](https://github.com/tmux-revamped/tmux-scroll-revamped/commit/ea5a9e97bc90a407183bb3092cfc4b942c412867))
+* **family:** honor only active exceptions ([5743aa1](https://github.com/tmux-revamped/tmux-scroll-revamped/commit/5743aa1a711e1ffc46db096aff38e067cb2d83e3))
+* **family:** reject unquoted replacements ([8a628e6](https://github.com/tmux-revamped/tmux-scroll-revamped/commit/8a628e603b2287a054160ebbeeea55c151e8063d))
+* **family:** require executable entry points ([2636c2e](https://github.com/tmux-revamped/tmux-scroll-revamped/commit/2636c2ee37e61a18b471f39d03122acc4e2548bb))
+
+
+### Features
+
+* add a shared desktop notifier ([1135d1a](https://github.com/tmux-revamped/tmux-scroll-revamped/commit/1135d1a7af0c8cc002cbc3ab8b3469ff6b47a33f))
+* **family:** accept bot updates in the audit ([caf14a7](https://github.com/tmux-revamped/tmux-scroll-revamped/commit/caf14a7b0261ba76e7fa88fa5e9699d764d16036))
+* rewrite the plugin in POSIX sh ([999b9f2](https://github.com/tmux-revamped/tmux-scroll-revamped/commit/999b9f29f9a567d92a2cf2ec8b06719a75d56c5a))
+
 All notable changes to this project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
