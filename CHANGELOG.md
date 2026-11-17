@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.2](https://github.com/tmux-revamped/tmux-scroll-revamped/compare/v3.1.1...v3.1.2) (2026-11-17)
+
+
+### Bug Fixes
+
+* scroll on the tick that enters copy-mode ([11720bd](https://github.com/tmux-revamped/tmux-scroll-revamped/commit/11720bd75cbc58973765d877054be24839396d55))
+
 ## [3.1.1](https://github.com/tmux-revamped/tmux-scroll-revamped/compare/v3.1.0...v3.1.1) (2026-11-16)
 
 
