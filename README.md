@@ -42,7 +42,7 @@ A full-screen app on the alternate screen, such as vim, less, htop or Claude Cod
 | Tool | Version | Used for |
 |:-----|:--------|:---------|
 | tmux | 3.2 or later | the family floor; the bindings also build on tmux 1.9 to 3.1, with the fallbacks under How it decides |
-| clipboard tool | optional | `@scroll_revamped_drag_copy`: `pbcopy` on macOS, `wl-copy`, `xclip` or `xsel` on Linux |
+| clipboard tool | optional | `@scroll_revamped_drag_copy` and `@scroll_revamped_click_copy`: `pbcopy` on macOS, `wl-copy`, `xclip` or `xsel` on Linux |
 | gum | optional | the menu, tables and colours of `scroll-revamped`; without it every command prints plain text |
 
 ### Install
@@ -98,6 +98,8 @@ With `@scroll_revamped_wheel` on, scroll: over vim, less, htop or a full-screen 
 | `@scroll_revamped_auto_exit` | `off` | `on` leaves copy-mode when a downward tick is already at the bottom |
 | `@scroll_revamped_indicator` | `off` | `on` flashes the scroll position, such as `scroll 120/4000`, on each copy-mode tick |
 | `@scroll_revamped_drag_copy` | `off` | `on` copies a mouse selection in copy-mode to the system clipboard |
+| `@scroll_revamped_click_copy` | `off` | `on` copies the word under a double click and the line under a triple click to the system clipboard, and leaves copy-mode |
+| `@scroll_revamped_smooth` | `off` | `on` scrolls a copy-mode tick in steps with a 5 ms pause between, one line per step up to 20 lines, so the text slides instead of jumping; line granularity and a speed below 1000, tmux 3.2 and later |
 | `@scroll_revamped_status_wheel` | `off` | `on` switches windows when the wheel rolls over the status line |
 
 Every option is also a command option with dashes, such as `--skip-empty on`, and an environment variable, such as `SCROLL_REVAMPED_SKIP_EMPTY`; the command line wins over the environment, and the environment over the tmux option. An empty tmux option means its default. With both passthrough options off, the wheel always enters copy-mode.
@@ -132,6 +134,10 @@ Speed, granularity, auto-exit and the indicator rebind the wheel in the `copy-mo
 <tr>
 <td width="50%" valign="top"><img src="screens/indicator.png" alt="scroll-revamped: @scroll_revamped_indicator flashes the scroll position"><br><sub><code>@scroll_revamped_indicator</code> flashes the scroll position, from <code>hero.tape</code></sub></td>
 <td width="50%" valign="top"><img src="screens/status-wheel.png" alt="scroll-revamped: @scroll_revamped_status_wheel switches windows over the status line"><br><sub><code>@scroll_revamped_status_wheel</code> switches windows over the status line, from <code>hero.tape</code></sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/smooth.png" alt="scroll-revamped: @scroll_revamped_smooth scrolls a tick one line at a time"><br><sub><code>@scroll_revamped_smooth</code> scrolls a wheel tick one line at a time, from <code>hero.tape</code></sub></td>
+<td width="50%" valign="top"><img src="screens/click-copy.png" alt="scroll-revamped: @scroll_revamped_click_copy copies a double-clicked word"><br><sub><code>@scroll_revamped_click_copy</code> copies a double-clicked word to the clipboard, from <code>hero.tape</code></sub></td>
 </tr>
 <tr>
 <td width="50%" valign="top"><img src="screens/menu.png" alt="scroll-revamped: The menu"><br><sub>The menu, from <code>stills.tape</code></sub></td>

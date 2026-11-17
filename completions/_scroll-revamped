@@ -26,6 +26,8 @@ _scroll_revamped() {
     '--auto-exit[leave copy-mode at the bottom]:value:(on off)' \
     '--indicator[flash the scroll position]:value:(on off)' \
     '--drag-copy[copy a selection to the clipboard]:value:(on off)' \
+    '--click-copy[copy the word or line clicked to the clipboard]:value:(on off)' \
+    '--smooth[scroll a copy-mode tick one line at a time]:value:(on off)' \
     '--status-wheel[switch windows over the status line]:value:(on off)' \
     '1:command:->command'
 

@@ -90,6 +90,11 @@ tmux options:
   @scroll_revamped_indicator              on flashes the scroll position (off)
   @scroll_revamped_drag_copy              on copies a mouse selection to the
                                           clipboard (off)
+  @scroll_revamped_click_copy             on copies the word on a double click
+                                          and the line on a triple click to
+                                          the clipboard (off)
+  @scroll_revamped_smooth                 on scrolls a copy-mode tick one line
+                                          at a time (off)
   @scroll_revamped_status_wheel           on switches windows over the status
                                           line (off)
   @revamped_theme                         the family look (kodougu)
@@ -119,7 +124,7 @@ scroll_revamped_doctor_clipboard() {
     revamped_doctor_line clipboard ok "${scroll_revamped_doctor_clipboard_tool}"
     return 0
   fi
-  revamped_doctor_line clipboard warn "drag copy needs pbcopy, wl-copy, xclip or xsel"
+  revamped_doctor_line clipboard warn "drag and click copy need pbcopy, wl-copy, xclip or xsel"
 }
 
 scroll_revamped_doctor() {

@@ -213,3 +213,115 @@ Sleep 150ms
 Sleep 1s
 Screenshot status-wheel.png
 Sleep 1500ms
+Hide
+Ctrl+]
+Type@5ms "tmux set -g @scroll_revamped_smooth on; scroll-revamped apply"
+Enter
+Show
+Type "tmux set -g @scroll_revamped_smooth on; scroll-revamped apply"
+Sleep 400ms
+Hide
+Ctrl+]
+Type@5ms "Enter"
+Enter
+Show
+Enter
+Sleep 1s
+Hide
+Type "clear; seq -f 'note %g' 1 200"
+Enter
+Sleep 500ms
+Show
+Hide
+Ctrl+]
+Type@5ms "Mouse wheel up"
+Enter
+Show
+Escape
+Type@1ms "[<64;40;12M"
+Sleep 150ms
+Escape
+Type@1ms "[<64;40;12M"
+Sleep 150ms
+Escape
+Type@1ms "[<64;40;12M"
+Sleep 150ms
+Escape
+Type@1ms "[<64;40;12M"
+Sleep 150ms
+Escape
+Type@1ms "[<64;40;12M"
+Sleep 150ms
+Escape
+Type@1ms "[<64;40;12M"
+Sleep 150ms
+Escape
+Type@1ms "[<64;40;12M"
+Sleep 150ms
+Escape
+Type@1ms "[<64;40;12M"
+Sleep 150ms
+Sleep 800ms
+Screenshot smooth.png
+Sleep 1s
+Hide
+Ctrl+]
+Type@5ms "q"
+Enter
+Show
+Type "q"
+Sleep 500ms
+Hide
+Ctrl+]
+Type@5ms "tmux set -g @scroll_revamped_click_copy on; scroll-revamped apply"
+Enter
+Show
+Type "tmux set -g @scroll_revamped_click_copy on; scroll-revamped apply"
+Sleep 400ms
+Hide
+Ctrl+]
+Type@5ms "Enter"
+Enter
+Show
+Enter
+Sleep 1s
+Hide
+Type "clear; echo deploy finished at noon"
+Enter
+Sleep 500ms
+Show
+Hide
+Ctrl+]
+Type@5ms "Double click"
+Enter
+Show
+Sleep 500ms
+Escape
+Type@1ms "[<0;10;3M"
+Sleep 60ms
+Escape
+Type@1ms "[<0;10;3m"
+Sleep 60ms
+Escape
+Type@1ms "[<0;10;3M"
+Sleep 60ms
+Escape
+Type@1ms "[<0;10;3m"
+Sleep 60ms
+Sleep 2s
+Hide
+Ctrl+]
+Type@5ms "cat clipboard; echo"
+Enter
+Show
+Type "cat clipboard; echo"
+Sleep 400ms
+Hide
+Ctrl+]
+Type@5ms "Enter"
+Enter
+Show
+Enter
+Sleep 1s
+Screenshot click-copy.png
+Sleep 1500ms

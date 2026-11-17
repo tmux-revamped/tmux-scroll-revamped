@@ -42,7 +42,7 @@ vim、less、htop 或 Claude Code 等在後備畫面上執行的全螢幕應用�
 | 工具 | 版本 | 用途 |
 |:-----|:--------|:---------|
 | tmux | 3.2 或以上 | 系列的最低版本；在 tmux 1.9 至 3.1 上亦能用判斷方式中的後備方案建立綁定 |
-| 剪貼簿工具 | 可選 | 用於 `@scroll_revamped_drag_copy`：macOS 上的 `pbcopy`，Linux 上的 `wl-copy`、`xclip` 或 `xsel` |
+| 剪貼簿工具 | 可選 | 用於 `@scroll_revamped_drag_copy` 和 `@scroll_revamped_click_copy`：macOS 上的 `pbcopy`，Linux 上的 `wl-copy`、`xclip` 或 `xsel` |
 | gum | 可選 | `scroll-revamped` 的選單、表格和顏色；沒有它，所有命令都輸出純文字 |
 
 ### 安裝
@@ -98,6 +98,8 @@ run-shell ~/.tmux/plugins/tmux-scroll-revamped/scroll-revamped.tmux
 | `@scroll_revamped_auto_exit` | `off` | `on` 時在底部向下捲動會離開複製模式 |
 | `@scroll_revamped_indicator` | `off` | `on` 時每次複製模式捲動都閃示位置，例如 `scroll 120/4000` |
 | `@scroll_revamped_drag_copy` | `off` | `on` 時把複製模式中的滑鼠選取範圍複製到系統剪貼簿 |
+| `@scroll_revamped_click_copy` | `off` | `on` 時把雙擊的單詞和三擊的整行複製到系統剪貼簿，並退出複製模式 |
+| `@scroll_revamped_smooth` | `off` | `on` 時把複製模式中的一格捲動拆成多步，每步相隔 5 毫秒，20 行以內每步一行，文字平滑移動而不跳動；只限按行捲動且速度低於 1000，需要 tmux 3.2 或以上 |
 | `@scroll_revamped_status_wheel` | `off` | `on` 時在狀態列上轉動滾輪會切換視窗 |
 
 每個選項亦可寫成以短橫線連接的命令選項，例如 `--skip-empty on`，以及環境變數，例如 `SCROLL_REVAMPED_SKIP_EMPTY`；命令列優先於環境變數，環境變數優先於 tmux 選項。空的 tmux 選項表示使用預設值。兩個 passthrough 選項都為 `off` 時，滾輪總是進入複製模式。
@@ -132,6 +134,10 @@ run-shell ~/.tmux/plugins/tmux-scroll-revamped/scroll-revamped.tmux
 <tr>
 <td width="50%" valign="top"><img src="screens/indicator.png" alt="scroll-revamped：@scroll_revamped_indicator 閃示捲動位置"><br><sub><code>@scroll_revamped_indicator</code> 閃示捲動位置，來自 <code>hero.tape</code></sub></td>
 <td width="50%" valign="top"><img src="screens/status-wheel.png" alt="scroll-revamped：@scroll_revamped_status_wheel 讓狀態列上的滾輪切換視窗"><br><sub><code>@scroll_revamped_status_wheel</code> 讓狀態列上的滾輪切換視窗，來自 <code>hero.tape</code></sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/smooth.png" alt="scroll-revamped：@scroll_revamped_smooth 把一格捲動拆成逐行捲動"><br><sub><code>@scroll_revamped_smooth</code> 把滾輪的一格拆成逐行捲動，來自 <code>hero.tape</code></sub></td>
+<td width="50%" valign="top"><img src="screens/click-copy.png" alt="scroll-revamped：@scroll_revamped_click_copy 複製雙擊的單詞"><br><sub><code>@scroll_revamped_click_copy</code> 把雙擊的單詞複製到剪貼簿，來自 <code>hero.tape</code></sub></td>
 </tr>
 <tr>
 <td width="50%" valign="top"><img src="screens/menu.png" alt="scroll-revamped：選單"><br><sub>選單，來自 <code>stills.tape</code></sub></td>

@@ -1,6 +1,6 @@
 $ scroll-revamped doctor
 tmux               ok       <path>, 3.8
-clipboard          warn     drag copy needs pbcopy, wl-copy, xclip or xsel
+clipboard          warn     drag and click copy need pbcopy, wl-copy, xclip or xsel
 gum                ok       <path>
 awk                ok       <path>, <flavor>
 sed                ok       <path>, <flavor>

@@ -42,7 +42,7 @@ vim、less、htop、Claude Code のように代替画面で動く全画面アプ
 | ツール | バージョン | 用途 |
 |:-----|:--------|:---------|
 | tmux | 3.2 以降 | ファミリー共通の最低バージョン。tmux 1.9 から 3.1 でも、判断のしかたに書いた代替手段で割り当てを組み立てます |
-| クリップボードのツール | 任意 | `@scroll_revamped_drag_copy` 用。macOS では `pbcopy`、Linux では `wl-copy`、`xclip`、`xsel` |
+| クリップボードのツール | 任意 | `@scroll_revamped_drag_copy` と `@scroll_revamped_click_copy` 用。macOS では `pbcopy`、Linux では `wl-copy`、`xclip`、`xsel` |
 | gum | 任意 | `scroll-revamped` のメニュー、表、色。なくてもすべてのコマンドがプレーンテキストで動きます |
 
 ### インストール
@@ -98,6 +98,8 @@ run-shell ~/.tmux/plugins/tmux-scroll-revamped/scroll-revamped.tmux
 | `@scroll_revamped_auto_exit` | `off` | `on` で、最下部にいるときの下向きのスクロールでコピーモードを抜けます |
 | `@scroll_revamped_indicator` | `off` | `on` でコピーモードのスクロールごとに位置（例 `scroll 120/4000`）を表示します |
 | `@scroll_revamped_drag_copy` | `off` | `on` でコピーモードのマウス選択をシステムのクリップボードにコピーします |
+| `@scroll_revamped_click_copy` | `off` | `on` でダブルクリックした単語とトリプルクリックした行をシステムのクリップボードにコピーし、コピーモードを抜けます |
+| `@scroll_revamped_smooth` | `off` | `on` でコピーモードの 1 ティックを 5 ミリ秒間隔のステップに分け、20 行までは 1 行ずつスクロールするので、文字が跳ばずに滑ります。行単位で速度が 1000 未満のとき、tmux 3.2 以降 |
 | `@scroll_revamped_status_wheel` | `off` | `on` でステータスラインの上のホイールでウィンドウを切り替えます |
 
 どのオプションも、ダッシュ区切りのコマンドオプション（例 `--skip-empty on`）と環境変数（例 `SCROLL_REVAMPED_SKIP_EMPTY`）で指定できます。優先順位はコマンドライン、環境変数、tmux オプションの順です。空の tmux オプションは既定値を意味します。2 つの passthrough オプションをどちらも `off` にすると、ホイールは常にコピーモードに入ります。
@@ -132,6 +134,10 @@ run-shell ~/.tmux/plugins/tmux-scroll-revamped/scroll-revamped.tmux
 <tr>
 <td width="50%" valign="top"><img src="screens/indicator.png" alt="scroll-revamped: @scroll_revamped_indicator がスクロール位置を表示する"><br><sub><code>@scroll_revamped_indicator</code> がスクロール位置を表示する。<code>hero.tape</code>より</sub></td>
 <td width="50%" valign="top"><img src="screens/status-wheel.png" alt="scroll-revamped: @scroll_revamped_status_wheel でステータスラインの上のホイールがウィンドウを切り替える"><br><sub><code>@scroll_revamped_status_wheel</code> でステータスラインの上のホイールがウィンドウを切り替える。<code>hero.tape</code>より</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/smooth.png" alt="scroll-revamped: @scroll_revamped_smooth は 1 ティックを 1 行ずつスクロールします"><br><sub><code>@scroll_revamped_smooth</code> はホイールの 1 ティックを 1 行ずつスクロールします。<code>hero.tape</code>より</sub></td>
+<td width="50%" valign="top"><img src="screens/click-copy.png" alt="scroll-revamped: @scroll_revamped_click_copy はダブルクリックした単語をコピーします"><br><sub><code>@scroll_revamped_click_copy</code> はダブルクリックした単語をクリップボードにコピーします。<code>hero.tape</code>より</sub></td>
 </tr>
 <tr>
 <td width="50%" valign="top"><img src="screens/menu.png" alt="scroll-revamped: メニュー"><br><sub>メニュー。<code>stills.tape</code>より</sub></td>

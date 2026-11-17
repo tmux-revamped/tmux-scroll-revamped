@@ -124,6 +124,55 @@ source "${BATS_TEST_DIRNAME:-.}/scroll_helpers.bash"
   [[ -z "${output}" ]]
 }
 
+@test "scroll - click copy binds double and triple click in the root and both copy-mode tables" {
+  # Arrange
+  option click_copy on
+  option mouse off
+  stub_command wl-copy
+  harness_hide pbcopy xclip xsel
+  export REVAMPED_TEST_UNAME_S=Linux REVAMPED_TEST_TMUX_VERSION=3.6
+
+  # Act
+  lib_run scroll 'scroll_revamped_plan; scroll_revamped_lines'
+
+  # Assert
+  [[ "${lines[0]}" == 'bind-key -n DoubleClick1Pane select-pane -t = ; if-shell -F "#{?#{||:#{pane_in_mode},#{mouse_any_flag}},1,0}" "send-keys -M" "copy-mode -H ; send-keys -X select-word ; run-shell -d 0.3 ; send-keys -X copy-pipe-and-cancel '"'wl-copy'"'"' ]] || false
+  [[ "${lines[1]}" == "bind-key -T copy-mode DoubleClick1Pane select-pane ; send-keys -X select-word ; run-shell -d 0.3 ; send-keys -X copy-pipe-and-cancel 'wl-copy'" ]] || false
+  [[ "${lines[2]}" == "bind-key -T copy-mode-vi DoubleClick1Pane select-pane ; send-keys -X select-word ; run-shell -d 0.3 ; send-keys -X copy-pipe-and-cancel 'wl-copy'" ]] || false
+  [[ "${lines[3]}" == 'bind-key -n TripleClick1Pane select-pane -t = ; if-shell -F "#{?#{||:#{pane_in_mode},#{mouse_any_flag}},1,0}" "send-keys -M" "copy-mode -H ; send-keys -X select-line ; run-shell -d 0.3 ; send-keys -X copy-pipe-and-cancel '"'wl-copy'"'"' ]] || false
+  [[ "${lines[4]}" == "bind-key -T copy-mode TripleClick1Pane select-pane ; send-keys -X select-line ; run-shell -d 0.3 ; send-keys -X copy-pipe-and-cancel 'wl-copy'" ]] || false
+  [[ "${#lines[@]}" -eq 6 ]]
+}
+
+@test "scroll - click copy binds nothing before tmux 3.2" {
+  # Arrange
+  option click_copy on
+  option mouse off
+  stub_command wl-copy
+  harness_hide pbcopy xclip xsel
+  export REVAMPED_TEST_UNAME_S=Linux REVAMPED_TEST_TMUX_VERSION=3.1
+
+  # Act
+  lib_run scroll 'scroll_revamped_plan; scroll_revamped_lines'
+
+  # Assert
+  [[ -z "${output}" ]]
+}
+
+@test "scroll - click copy binds nothing without a clipboard tool" {
+  # Arrange
+  option click_copy on
+  option mouse off
+  harness_hide pbcopy wl-copy xclip xsel
+  export REVAMPED_TEST_TMUX_VERSION=3.6
+
+  # Act
+  lib_run scroll 'scroll_revamped_plan; scroll_revamped_lines'
+
+  # Assert
+  [[ -z "${output}" ]]
+}
+
 @test "scroll - the clipboard prefers pbcopy on macOS, then wl-copy, xclip and xsel" {
   # Arrange
   stub_command pbcopy

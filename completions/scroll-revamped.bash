@@ -55,6 +55,14 @@ _scroll_revamped() {
     COMPREPLY=($(compgen -W "on off" -- "${cur}"))
     return
     ;;
+  --click-copy)
+    COMPREPLY=($(compgen -W "on off" -- "${cur}"))
+    return
+    ;;
+  --smooth)
+    COMPREPLY=($(compgen -W "on off" -- "${cur}"))
+    return
+    ;;
   --status-wheel)
     COMPREPLY=($(compgen -W "on off" -- "${cur}"))
     return
@@ -65,7 +73,7 @@ _scroll_revamped() {
   *) ;;
   esac
 
-  COMPREPLY=($(compgen -W "apply list check doctor version help --json --theme --wheel --passthrough-alternate --passthrough-mouse --skip-empty --select-pane --alt-keys --mouse --speed --granularity --auto-exit --indicator --drag-copy --status-wheel" -- "${cur}"))
+  COMPREPLY=($(compgen -W "apply list check doctor version help --json --theme --wheel --passthrough-alternate --passthrough-mouse --skip-empty --select-pane --alt-keys --mouse --speed --granularity --auto-exit --indicator --drag-copy --click-copy --smooth --status-wheel" -- "${cur}"))
 }
 
 complete -F _scroll_revamped scroll-revamped

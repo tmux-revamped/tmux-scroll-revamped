@@ -42,7 +42,7 @@ vim、less、htop 或 Claude Code 等在备用屏幕上运行的全屏应用会�
 | 工具 | 版本 | 用途 |
 |:-----|:--------|:---------|
 | tmux | 3.2 或更高 | 家族的最低版本；在 tmux 1.9 到 3.1 上也能用判断方式中的后备方案生成绑定 |
-| 剪贴板工具 | 可选 | 用于 `@scroll_revamped_drag_copy`：macOS 上的 `pbcopy`，Linux 上的 `wl-copy`、`xclip` 或 `xsel` |
+| 剪贴板工具 | 可选 | 用于 `@scroll_revamped_drag_copy` 和 `@scroll_revamped_click_copy`：macOS 上的 `pbcopy`，Linux 上的 `wl-copy`、`xclip` 或 `xsel` |
 | gum | 可选 | `scroll-revamped` 的菜单、表格和颜色；没有它，所有命令都输出纯文本 |
 
 ### 安装
@@ -98,6 +98,8 @@ run-shell ~/.tmux/plugins/tmux-scroll-revamped/scroll-revamped.tmux
 | `@scroll_revamped_auto_exit` | `off` | `on` 时在底部向下滚动会离开复制模式 |
 | `@scroll_revamped_indicator` | `off` | `on` 时每次复制模式滚动都闪示位置，例如 `scroll 120/4000` |
 | `@scroll_revamped_drag_copy` | `off` | `on` 时把复制模式中的鼠标选区复制到系统剪贴板 |
+| `@scroll_revamped_click_copy` | `off` | `on` 时把双击的单词和三击的整行复制到系统剪贴板，并退出复制模式 |
+| `@scroll_revamped_smooth` | `off` | `on` 时把复制模式中的一格滚动拆成多步，每步间隔 5 毫秒，20 行以内每步一行，文字平滑移动而不跳动；仅限按行滚动且速度低于 1000，需要 tmux 3.2 及以上 |
 | `@scroll_revamped_status_wheel` | `off` | `on` 时在状态栏上滚动滚轮会切换窗口 |
 
 每个选项也可以写成用短横线连接的命令选项，例如 `--skip-empty on`，以及环境变量，例如 `SCROLL_REVAMPED_SKIP_EMPTY`；命令行优先于环境变量，环境变量优先于 tmux 选项。空的 tmux 选项表示使用默认值。两个 passthrough 选项都为 `off` 时，滚轮总是进入复制模式。
@@ -132,6 +134,10 @@ run-shell ~/.tmux/plugins/tmux-scroll-revamped/scroll-revamped.tmux
 <tr>
 <td width="50%" valign="top"><img src="screens/indicator.png" alt="scroll-revamped：@scroll_revamped_indicator 闪示滚动位置"><br><sub><code>@scroll_revamped_indicator</code> 闪示滚动位置，来自 <code>hero.tape</code></sub></td>
 <td width="50%" valign="top"><img src="screens/status-wheel.png" alt="scroll-revamped：@scroll_revamped_status_wheel 让状态栏上的滚轮切换窗口"><br><sub><code>@scroll_revamped_status_wheel</code> 让状态栏上的滚轮切换窗口，来自 <code>hero.tape</code></sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="screens/smooth.png" alt="scroll-revamped：@scroll_revamped_smooth 把一格滚动拆成逐行滚动"><br><sub><code>@scroll_revamped_smooth</code> 把滚轮的一格拆成逐行滚动，来自 <code>hero.tape</code></sub></td>
+<td width="50%" valign="top"><img src="screens/click-copy.png" alt="scroll-revamped：@scroll_revamped_click_copy 复制双击的单词"><br><sub><code>@scroll_revamped_click_copy</code> 把双击的单词复制到剪贴板，来自 <code>hero.tape</code></sub></td>
 </tr>
 <tr>
 <td width="50%" valign="top"><img src="screens/menu.png" alt="scroll-revamped：菜单"><br><sub>菜单，来自 <code>stills.tape</code></sub></td>

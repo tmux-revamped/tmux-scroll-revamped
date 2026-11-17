@@ -19,4 +19,6 @@ complete -c scroll-revamped -l granularity -r -a 'line halfpage page' -d 'how fa
 complete -c scroll-revamped -l auto-exit -r -a 'on off' -d 'leave copy-mode at the bottom'
 complete -c scroll-revamped -l indicator -r -a 'on off' -d 'flash the scroll position'
 complete -c scroll-revamped -l drag-copy -r -a 'on off' -d 'copy a selection to the clipboard'
+complete -c scroll-revamped -l click-copy -r -a 'on off' -d 'copy the word or line clicked to the clipboard'
+complete -c scroll-revamped -l smooth -r -a 'on off' -d 'scroll a copy-mode tick one line at a time'
 complete -c scroll-revamped -l status-wheel -r -a 'on off' -d 'switch windows over the status line'

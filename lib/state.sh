@@ -16,8 +16,10 @@ granularity	line
 auto_exit	off
 indicator	off
 drag_copy	off
+click_copy	off
+smooth	off
 status_wheel	off'
-SCROLL_REVAMPED_NAMES='mouse wheel passthrough_alternate passthrough_mouse skip_empty alt_keys select_pane speed granularity auto_exit indicator drag_copy status_wheel'
+SCROLL_REVAMPED_NAMES='mouse wheel passthrough_alternate passthrough_mouse skip_empty alt_keys select_pane speed granularity auto_exit indicator drag_copy click_copy smooth status_wheel'
 SCROLL_REVAMPED_S_mouse='on'
 SCROLL_REVAMPED_S_wheel='off'
 SCROLL_REVAMPED_S_passthrough_alternate='on'
@@ -30,14 +32,19 @@ SCROLL_REVAMPED_S_granularity='line'
 SCROLL_REVAMPED_S_auto_exit='off'
 SCROLL_REVAMPED_S_indicator='off'
 SCROLL_REVAMPED_S_drag_copy='off'
+SCROLL_REVAMPED_S_click_copy='off'
+SCROLL_REVAMPED_S_smooth='off'
 SCROLL_REVAMPED_S_status_wheel='off'
-SCROLL_REVAMPED_MAX_ALT_KEYS=20
+SCROLL_REVAMPED_MAX_REPEATS=20
 SCROLL_REVAMPED_CACHE_KEY=@scroll_revamped_cache_key
 SCROLL_REVAMPED_CACHE_VAL=@scroll_revamped_cache_val
 SCROLL_REVAMPED_PLAN=""
 SCROLL_REVAMPED_TMUX=""
 SCROLL_REVAMPED_COUNT=""
 SCROLL_REVAMPED_STOCK_LINES=5
+SCROLL_REVAMPED_CLICK_SECONDS=0.3
+SCROLL_REVAMPED_SMOOTH_SECONDS=0.005
+SCROLL_REVAMPED_SMOOTH=0
 SCROLL_REVAMPED_TUNED=0
 SCROLL_REVAMPED_FIRST=""
 SCROLL_REVAMPED_TOOL=""

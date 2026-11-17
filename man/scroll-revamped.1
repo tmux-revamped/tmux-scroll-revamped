@@ -186,6 +186,21 @@ copies a mouse selection in copy-mode to the system clipboard through
 pbcopy, wl-copy, xclip or xsel. The default is
 .BR off .
 .TP
+.B @scroll_revamped_click_copy
+.B on
+copies the word under a double click and the line under a triple click to the
+system clipboard through the same tool, and leaves copy-mode, on tmux 3.2 and
+later. The default is
+.BR off .
+.TP
+.B @scroll_revamped_smooth
+.B on
+scrolls a copy-mode tick in steps with a pause of 5 milliseconds between, one
+line per step up to 20 lines, so the text slides instead of jumping, on tmux
+3.2 and later. It applies to the line granularity and to a speed below 1000.
+The default is
+.BR off .
+.TP
 .B @scroll_revamped_status_wheel
 .B on
 switches windows when the wheel rolls over the status line, on tmux 2.1 and

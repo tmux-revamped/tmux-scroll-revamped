@@ -118,10 +118,10 @@ scroll_revamped_condition() {
 
 scroll_revamped_reps() {
   case "$1" in
-  ??? | ????*) printf '%s' "${SCROLL_REVAMPED_MAX_ALT_KEYS}" ;;
+  ??? | ????*) printf '%s' "${SCROLL_REVAMPED_MAX_REPEATS}" ;;
   *)
-    if [ "$1" -gt "${SCROLL_REVAMPED_MAX_ALT_KEYS}" ]; then
-      printf '%s' "${SCROLL_REVAMPED_MAX_ALT_KEYS}"
+    if [ "$1" -gt "${SCROLL_REVAMPED_MAX_REPEATS}" ]; then
+      printf '%s' "${SCROLL_REVAMPED_MAX_REPEATS}"
     else
       printf '%s' "$1"
     fi
@@ -188,7 +188,26 @@ scroll_revamped_plan_wheel() {
   scroll_revamped_emit bind-key -n WheelDownPane "${scroll_revamped_plan_wheel_prefix}${scroll_revamped_plan_wheel_down}"
 }
 
+scroll_revamped_smooth_command() {
+  scroll_revamped_smooth_command_lines="${SCROLL_REVAMPED_COUNT:-${SCROLL_REVAMPED_STOCK_LINES}}"
+  scroll_revamped_smooth_command_steps=$(scroll_revamped_reps "${scroll_revamped_smooth_command_lines}")
+  scroll_revamped_smooth_command_each=$((scroll_revamped_smooth_command_lines / scroll_revamped_smooth_command_steps))
+  scroll_revamped_smooth_command_first=$((scroll_revamped_smooth_command_each + scroll_revamped_smooth_command_lines % scroll_revamped_smooth_command_steps))
+  scroll_revamped_smooth_command_out="send-keys -X -N ${scroll_revamped_smooth_command_first} scroll-$1"
+  scroll_revamped_smooth_command_step="send-keys -X -N ${scroll_revamped_smooth_command_each} scroll-$1"
+  [ "$1" = up ] || scroll_revamped_smooth_command_step="if-shell -F \"#{pane_in_mode}\" \"${scroll_revamped_smooth_command_step}\""
+  while [ "${scroll_revamped_smooth_command_steps}" -gt 1 ]; do
+    scroll_revamped_smooth_command_out="${scroll_revamped_smooth_command_out} ; run-shell -d ${SCROLL_REVAMPED_SMOOTH_SECONDS} ; ${scroll_revamped_smooth_command_step}"
+    scroll_revamped_smooth_command_steps=$((scroll_revamped_smooth_command_steps - 1))
+  done
+  printf '%s' "${scroll_revamped_smooth_command_out}"
+}
+
 scroll_revamped_x_command() {
+  if [ "${SCROLL_REVAMPED_SMOOTH}" -eq 1 ]; then
+    scroll_revamped_smooth_command "$1"
+    return 0
+  fi
   scroll_revamped_x_command_verb="scroll-$1"
   case "${SCROLL_REVAMPED_S_granularity}" in
   page) scroll_revamped_x_command_verb="page-$1" ;;
@@ -231,9 +250,15 @@ scroll_revamped_ticks() {
   line | halfpage | page) : ;;
   *) SCROLL_REVAMPED_S_granularity=line ;;
   esac
+  SCROLL_REVAMPED_SMOOTH=0
+  case "${SCROLL_REVAMPED_S_smooth}:${SCROLL_REVAMPED_S_granularity}:${SCROLL_REVAMPED_COUNT:-${SCROLL_REVAMPED_STOCK_LINES}}" in
+  on:line:????*) : ;;
+  on:line:*) ! scroll_revamped_at_least 3.2 || SCROLL_REVAMPED_SMOOTH=1 ;;
+  *) : ;;
+  esac
   SCROLL_REVAMPED_TUNED=0
-  case "${SCROLL_REVAMPED_S_granularity}:${SCROLL_REVAMPED_COUNT}:${SCROLL_REVAMPED_S_auto_exit}:${SCROLL_REVAMPED_S_indicator}" in
-  line::off:off) : ;;
+  case "${SCROLL_REVAMPED_S_granularity}:${SCROLL_REVAMPED_COUNT}:${SCROLL_REVAMPED_S_auto_exit}:${SCROLL_REVAMPED_S_indicator}:${SCROLL_REVAMPED_SMOOTH}" in
+  line::off:off:0) : ;;
   *) SCROLL_REVAMPED_TUNED=1 ;;
   esac
   scroll_revamped_copymode_actions
@@ -256,6 +281,21 @@ scroll_revamped_plan_copymode() {
   done
 }
 
+scroll_revamped_plan_clicks() {
+  [ "${SCROLL_REVAMPED_S_click_copy}" = on ] || return 0
+  scroll_revamped_at_least 3.2 || return 0
+  scroll_revamped_plan_clicks_clip=$(scroll_revamped_clipboard)
+  [ -n "${scroll_revamped_plan_clicks_clip}" ] || return 0
+  scroll_revamped_plan_clicks_pass=$(scroll_revamped_or '#{pane_in_mode}' '#{mouse_any_flag}')
+  for scroll_revamped_plan_clicks_pair in DoubleClick1Pane:select-word TripleClick1Pane:select-line; do
+    scroll_revamped_plan_clicks_key="${scroll_revamped_plan_clicks_pair%%:*}"
+    scroll_revamped_plan_clicks_copy="send-keys -X ${scroll_revamped_plan_clicks_pair#*:} ; run-shell -d ${SCROLL_REVAMPED_CLICK_SECONDS} ; send-keys -X copy-pipe-and-cancel '${scroll_revamped_plan_clicks_clip}'"
+    scroll_revamped_emit bind-key -n "${scroll_revamped_plan_clicks_key}" "select-pane -t = ; if-shell -F \"#{?${scroll_revamped_plan_clicks_pass},1,0}\" \"send-keys -M\" \"copy-mode -H ; ${scroll_revamped_plan_clicks_copy}\""
+    scroll_revamped_emit bind-key -T copy-mode "${scroll_revamped_plan_clicks_key}" "select-pane ; ${scroll_revamped_plan_clicks_copy}"
+    scroll_revamped_emit bind-key -T copy-mode-vi "${scroll_revamped_plan_clicks_key}" "select-pane ; ${scroll_revamped_plan_clicks_copy}"
+  done
+}
+
 scroll_revamped_plan_status() {
   [ "${SCROLL_REVAMPED_S_status_wheel}" = on ] || return 0
   scroll_revamped_at_least 2.1 || return 0
@@ -273,6 +313,7 @@ scroll_revamped_plan() {
   scroll_revamped_ticks
   scroll_revamped_plan_wheel
   scroll_revamped_plan_copymode
+  scroll_revamped_plan_clicks
   scroll_revamped_plan_status
 }
 

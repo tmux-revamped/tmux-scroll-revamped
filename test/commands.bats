@@ -203,5 +203,5 @@ plain_tty() {
 
   # Assert
   [[ "${status}" -eq 0 ]]
-  [[ "${output}" =~ clipboard\ +warn\ +drag\ copy\ needs ]]
+  [[ "${output}" =~ clipboard\ +warn\ +drag\ and\ click\ copy\ need\ pbcopy ]]
 }
