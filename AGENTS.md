@@ -14,7 +14,7 @@ Guidance for anyone, human or agent, changing tmux-scroll-revamped. What it is a
 | [`lib/state.sh`](lib/state.sh) | Every global, including `SCROLL_REVAMPED_SETTINGS`, the table of setting names and defaults the rest reads |
 | [`lib/core.sh`](lib/core.sh) | The version |
 | [`lib/`](lib) | Every other file is the shared library, identical in every member |
-| [`test/scroll.bats`](test/scroll.bats), [`test/commands.bats`](test/commands.bats), [`test/entrypoint.bats`](test/entrypoint.bats) | This member's suites: the library, the commands, and the entry point and `check` on a private tmux server |
+| [`test/scroll.bats`](test/scroll.bats), [`test/commands.bats`](test/commands.bats), [`test/entrypoint.bats`](test/entrypoint.bats), [`test/wheel.bats`](test/wheel.bats) | This member's suites: the library, the commands, the entry point and `check` on a private tmux server, and real wheel and drag events sent through a second tmux attached to it |
 | [`screens/`](screens) | The tapes and the recording's tmux config, which turns the wheel routing on and puts the status line on top; the hero tape sends real wheel events as typed SGR mouse sequences |
 
 ## Names
@@ -37,6 +37,7 @@ Guidance for anyone, human or agent, changing tmux-scroll-revamped. What it is a
 - On tmux 1.9 each tick runs `check` with the pane's alternate, mouse and history flags; a flag an option turns off is passed as a constant, and the decision is cached per pane state in one `display-message` read and one `set-option` write.
 - The tool path in the 1.9 binding is quoted for `sh`, then escaped for a tmux double-quoted string, with `#` doubled, so a checkout path with a space, a quote or a hash survives.
 - Arrow alt keys repeat the key `@scroll_revamped_speed` times, 3 when unset, capped at 20 by length before the value is compared, so a huge number never overflows the shell. Alt keys need tmux 2.0.
+- The tick that takes a pane into copy-mode also scrolls it: on tmux 2.4 and later it runs the tuned copy-mode tick, or tmux's own five lines when nothing tunes it, because a pane in copy-mode ignores a forwarded mouse event; before 2.4 it forwards the event.
 - Copy-mode tuning binds both copy-mode tables on tmux 2.4 and later; the indicator needs 3.2 and the status-line wheel 2.1.
 - Drag copy uses `pbcopy` on macOS, then `wl-copy`, `xclip` and `xsel`, and binds nothing when none exists; `doctor` names the one it would use.
 
@@ -47,6 +48,4 @@ Guidance for anyone, human or agent, changing tmux-scroll-revamped. What it is a
 
 ## Gaps against FAMILY.md
 
-As of 2026-11-16:
-
-- No test presses its wheel bindings through a real client; the suites check the bound commands and call them directly.
+As of 2026-11-17, none.

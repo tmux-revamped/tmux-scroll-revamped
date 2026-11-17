@@ -1,6 +1,6 @@
 $ scroll-revamped list
 set-option -g mouse on
-bind-key -n WheelUpPane if-shell -F "#{?#{||:#{alternate_on},#{||:#{mouse_any_flag},#{pane_in_mode}}},1,0}" "send-keys -M" "copy-mode -e ; send-keys -M"
+bind-key -n WheelUpPane if-shell -F "#{?#{||:#{alternate_on},#{||:#{mouse_any_flag},#{pane_in_mode}}},1,0}" "send-keys -M" "copy-mode -e ; send-keys -X -N 3 scroll-up"
 bind-key -n WheelDownPane send-keys -M
 bind-key -T copy-mode WheelUpPane send-keys -X -N 3 scroll-up
 bind-key -T copy-mode WheelDownPane send-keys -X -N 3 scroll-down

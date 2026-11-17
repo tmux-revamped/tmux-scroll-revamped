@@ -89,7 +89,7 @@ refuse() {
   plan_at 3.6
 
   # Assert
-  [[ "${lines[1]}" == 'bind-key -n WheelUpPane if-shell -F "#{?#{||:#{alternate_on},#{||:#{mouse_any_flag},#{pane_in_mode}}},1,0}" "send-keys -M" "copy-mode -e ; send-keys -M"' ]]
+  [[ "${lines[1]}" == 'bind-key -n WheelUpPane if-shell -F "#{?#{||:#{alternate_on},#{||:#{mouse_any_flag},#{pane_in_mode}}},1,0}" "send-keys -M" "copy-mode -e ; send-keys -X -N 5 scroll-up"' ]]
   [[ "${lines[2]}" == "bind-key -n WheelDownPane send-keys -M" ]]
 }
 
@@ -101,7 +101,42 @@ refuse() {
   plan_at 2.9
 
   # Assert
-  [[ "${lines[1]}" == 'bind-key -n WheelUpPane if-shell -F "#{?#{?#{alternate_on},1,#{?#{mouse_any_flag},1,#{pane_in_mode}}},1,0}" "send-keys -M" "copy-mode -e ; send-keys -M"' ]]
+  [[ "${lines[1]}" == 'bind-key -n WheelUpPane if-shell -F "#{?#{?#{alternate_on},1,#{?#{mouse_any_flag},1,#{pane_in_mode}}},1,0}" "send-keys -M" "copy-mode -e ; send-keys -X -N 5 scroll-up"' ]]
+}
+
+@test "scroll - the first tick into copy-mode scrolls tmux's five lines when nothing tunes the tick" {
+  # Arrange
+  option wheel on
+
+  # Act
+  plan_at 3.6
+
+  # Assert
+  [[ "${lines[1]}" == *'"copy-mode -e ; send-keys -X -N 5 scroll-up"' ]]
+}
+
+@test "scroll - the first tick into copy-mode runs the tuned tick when the speed is set" {
+  # Arrange
+  option wheel on
+  option speed 7
+
+  # Act
+  plan_at 3.6
+
+  # Assert
+  [[ "${lines[1]}" == *'"copy-mode -e ; send-keys -X -N 7 scroll-up"' ]]
+}
+
+@test "scroll - before tmux 2.4 the first tick into copy-mode forwards the mouse event" {
+  # Arrange
+  option wheel on
+  option speed 7
+
+  # Act
+  plan_at 2.3
+
+  # Assert
+  [[ "${lines[1]}" == *'"copy-mode -e ; send-keys -M"' ]]
 }
 
 @test "scroll - disabled passthroughs and skip-empty shape the condition" {

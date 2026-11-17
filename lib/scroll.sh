@@ -183,7 +183,7 @@ scroll_revamped_plan_wheel() {
   scroll_revamped_plan_wheel_cond=$(scroll_revamped_condition)
   scroll_revamped_plan_wheel_up=$(scroll_revamped_action up)
   scroll_revamped_plan_wheel_down=$(scroll_revamped_action down)
-  scroll_revamped_plan_wheel_up=$(printf 'if-shell -F "#{?%s,1,0}" "%s" "%s"' "${scroll_revamped_plan_wheel_cond}" "${scroll_revamped_plan_wheel_up}" 'copy-mode -e ; send-keys -M')
+  scroll_revamped_plan_wheel_up=$(printf 'if-shell -F "#{?%s,1,0}" "%s" "copy-mode -e ; %s"' "${scroll_revamped_plan_wheel_cond}" "${scroll_revamped_plan_wheel_up}" "${SCROLL_REVAMPED_FIRST}")
   scroll_revamped_emit bind-key -n WheelUpPane "${scroll_revamped_plan_wheel_prefix}${scroll_revamped_plan_wheel_up}"
   scroll_revamped_emit bind-key -n WheelDownPane "${scroll_revamped_plan_wheel_prefix}${scroll_revamped_plan_wheel_down}"
 }
@@ -226,22 +226,29 @@ scroll_revamped_copymode_actions() {
   fi
 }
 
-scroll_revamped_plan_copymode() {
-  scroll_revamped_at_least 2.4 || return 0
+scroll_revamped_ticks() {
   case "${SCROLL_REVAMPED_S_granularity}" in
   line | halfpage | page) : ;;
   *) SCROLL_REVAMPED_S_granularity=line ;;
   esac
-  scroll_revamped_plan_copymode_need=0
+  SCROLL_REVAMPED_TUNED=0
   case "${SCROLL_REVAMPED_S_granularity}:${SCROLL_REVAMPED_COUNT}:${SCROLL_REVAMPED_S_auto_exit}:${SCROLL_REVAMPED_S_indicator}" in
   line::off:off) : ;;
-  *) scroll_revamped_plan_copymode_need=1 ;;
+  *) SCROLL_REVAMPED_TUNED=1 ;;
   esac
+  scroll_revamped_copymode_actions
+  SCROLL_REVAMPED_FIRST='send-keys -M'
+  scroll_revamped_at_least 2.4 || return 0
+  SCROLL_REVAMPED_FIRST="send-keys -X -N ${SCROLL_REVAMPED_STOCK_LINES} scroll-up"
+  [ "${SCROLL_REVAMPED_TUNED}" -eq 0 ] || SCROLL_REVAMPED_FIRST="${SCROLL_REVAMPED_UP}"
+}
+
+scroll_revamped_plan_copymode() {
+  scroll_revamped_at_least 2.4 || return 0
   scroll_revamped_plan_copymode_clip=""
   [ "${SCROLL_REVAMPED_S_drag_copy}" != on ] || scroll_revamped_plan_copymode_clip=$(scroll_revamped_clipboard)
-  scroll_revamped_copymode_actions
   for scroll_revamped_plan_copymode_table in copy-mode copy-mode-vi; do
-    if [ "${scroll_revamped_plan_copymode_need}" -eq 1 ]; then
+    if [ "${SCROLL_REVAMPED_TUNED}" -eq 1 ]; then
       scroll_revamped_emit bind-key -T "${scroll_revamped_plan_copymode_table}" WheelUpPane "${SCROLL_REVAMPED_UP}"
       scroll_revamped_emit bind-key -T "${scroll_revamped_plan_copymode_table}" WheelDownPane "${SCROLL_REVAMPED_DOWN}"
     fi
@@ -263,6 +270,7 @@ scroll_revamped_plan() {
   SCROLL_REVAMPED_COUNT=$(scroll_revamped_valid_speed "${SCROLL_REVAMPED_S_speed}")
   SCROLL_REVAMPED_PLAN=""
   [ "${SCROLL_REVAMPED_S_mouse}" != on ] || scroll_revamped_emit set-option -g mouse on
+  scroll_revamped_ticks
   scroll_revamped_plan_wheel
   scroll_revamped_plan_copymode
   scroll_revamped_plan_status
