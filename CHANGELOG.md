@@ -1,5 +1,12 @@
 # Changelog
 
+# [3.2.0](https://github.com/tmux-revamped/tmux-scroll-revamped/compare/v3.1.2...v3.2.0) (2026-11-17)
+
+
+### Features
+
+* add click copy and smooth scroll ([af2aac5](https://github.com/tmux-revamped/tmux-scroll-revamped/commit/af2aac556ddfc94a8d15e2bc1c52b44d43418996))
+
 ## [3.1.2](https://github.com/tmux-revamped/tmux-scroll-revamped/compare/v3.1.1...v3.1.2) (2026-11-17)
 
 
