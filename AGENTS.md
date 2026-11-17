@@ -14,7 +14,7 @@ Guidance for anyone, human or agent, changing tmux-scroll-revamped. What it is a
 | [`lib/state.sh`](lib/state.sh) | Every global, including `SCROLL_REVAMPED_SETTINGS`, the table of setting names and defaults the rest reads |
 | [`lib/core.sh`](lib/core.sh) | The version |
 | [`lib/`](lib) | Every other file is the shared library, identical in every member |
-| [`test/scroll.bats`](test/scroll.bats), [`test/commands.bats`](test/commands.bats), [`test/entrypoint.bats`](test/entrypoint.bats), [`test/wheel.bats`](test/wheel.bats) | This member's suites: the library, the commands, the entry point and `check` on a private tmux server, and real wheel and drag events sent through a second tmux attached to it |
+| [`test/scroll.bats`](test/scroll.bats), [`test/scroll-tuning.bats`](test/scroll-tuning.bats), [`test/commands.bats`](test/commands.bats), [`test/entrypoint.bats`](test/entrypoint.bats), [`test/wheel.bats`](test/wheel.bats) | This member's suites: the library, the commands, the entry point and `check` on a private tmux server, and real wheel and drag events sent through a second tmux attached to it |
 | [`screens/`](screens) | The tapes and the recording's tmux config, which turns the wheel routing on and puts the status line on top; the hero tape sends real wheel events as typed SGR mouse sequences |
 
 ## Names
