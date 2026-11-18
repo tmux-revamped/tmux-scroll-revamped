@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.2.1](https://github.com/tmux-revamped/tmux-scroll-revamped/compare/v3.2.0...v3.2.1) (2026-11-18)
+
+
+### Bug Fixes
+
+* read the smooth setting from the environment ([72a252e](https://github.com/tmux-revamped/tmux-scroll-revamped/commit/72a252e0fc16b3d962ec2dc97a38d221291611b9))
+* stop counting some characters twice ([be007a8](https://github.com/tmux-revamped/tmux-scroll-revamped/commit/be007a83d8bae418a1ae8031644eb919a637a2a8))
+
 # [3.2.0](https://github.com/tmux-revamped/tmux-scroll-revamped/compare/v3.1.2...v3.2.0) (2026-11-17)
 
 
