@@ -27,7 +27,6 @@ Guidance for anyone, human or agent, changing tmux-scroll-revamped. What it is a
 ## Behaviour
 
 - `apply` reads every setting with one `tmux display-message` call and one `env` read, builds the plan, and sends every command to tmux in one call separated by `;`. Nothing runs in the background afterwards.
-- An empty tmux option means its default.
 - The entry point clears every inherited `REVAMPED_` variable except the test switches, and every `SCROLL_REVAMPED_*_LOADED` guard; every other global is assigned outright in the state module.
 - It binds no prefix key; it owns the root-table wheel keys, declared in the family key allocation, and only when `@scroll_revamped_wheel` is on.
 
