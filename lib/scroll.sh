@@ -204,7 +204,7 @@ scroll_revamped_smooth_command() {
 }
 
 scroll_revamped_x_command() {
-  if [ "${SCROLL_REVAMPED_SMOOTH}" -eq 1 ]; then
+  if [ "${SCROLL_REVAMPED_SMOOTHED}" -eq 1 ]; then
     scroll_revamped_smooth_command "$1"
     return 0
   fi
@@ -250,14 +250,14 @@ scroll_revamped_ticks() {
   line | halfpage | page) : ;;
   *) SCROLL_REVAMPED_S_granularity=line ;;
   esac
-  SCROLL_REVAMPED_SMOOTH=0
+  SCROLL_REVAMPED_SMOOTHED=0
   case "${SCROLL_REVAMPED_S_smooth}:${SCROLL_REVAMPED_S_granularity}:${SCROLL_REVAMPED_COUNT:-${SCROLL_REVAMPED_STOCK_LINES}}" in
   on:line:????*) : ;;
-  on:line:*) ! scroll_revamped_at_least 3.2 || SCROLL_REVAMPED_SMOOTH=1 ;;
+  on:line:*) ! scroll_revamped_at_least 3.2 || SCROLL_REVAMPED_SMOOTHED=1 ;;
   *) : ;;
   esac
   SCROLL_REVAMPED_TUNED=0
-  case "${SCROLL_REVAMPED_S_granularity}:${SCROLL_REVAMPED_COUNT}:${SCROLL_REVAMPED_S_auto_exit}:${SCROLL_REVAMPED_S_indicator}:${SCROLL_REVAMPED_SMOOTH}" in
+  case "${SCROLL_REVAMPED_S_granularity}:${SCROLL_REVAMPED_COUNT}:${SCROLL_REVAMPED_S_auto_exit}:${SCROLL_REVAMPED_S_indicator}:${SCROLL_REVAMPED_SMOOTHED}" in
   line::off:off:0) : ;;
   *) SCROLL_REVAMPED_TUNED=1 ;;
   esac

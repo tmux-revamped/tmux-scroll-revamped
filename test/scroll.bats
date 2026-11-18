@@ -243,3 +243,14 @@ source "${BATS_TEST_DIRNAME:-.}/scroll_helpers.bash"
   # Assert
   [[ "${output}" == "'/tmp/it'\\\\''s \\\"a\\\" \\\$x ##1\\\\b/bin/scroll-revamped'" ]]
 }
+
+@test "scroll - a smooth setting given in the environment is the one the settings read" {
+  # Arrange
+  export SCROLL_REVAMPED_SMOOTH=on
+
+  # Act
+  lib_run scroll 'scroll_revamped_load; printf "[%s]\n" "${SCROLL_REVAMPED_S_smooth}"'
+
+  # Assert
+  [[ "${output}" == "[on]" ]]
+}
