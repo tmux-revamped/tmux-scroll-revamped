@@ -1,5 +1,19 @@
 # Changelog
 
+# [3.3.0](https://github.com/tmux-revamped/tmux-scroll-revamped/compare/v3.2.1...v3.3.0) (2026-11-19)
+
+
+### Bug Fixes
+
+* fold a table wider than the terminal ([a5cd4af](https://github.com/tmux-revamped/tmux-scroll-revamped/commit/a5cd4af92640461faf5e76e035421fdfe4268dc8))
+* read the grep of macOS as bsd in doctor ([353210b](https://github.com/tmux-revamped/tmux-scroll-revamped/commit/353210b00fb10198a72448edfb6e9da548d7abe1))
+* stop a recording that hangs ([2976bd2](https://github.com/tmux-revamped/tmux-scroll-revamped/commit/2976bd265220cbd324e055b19ad26505563f16cb))
+
+
+### Features
+
+* name unknown setting values in doctor ([daa4f70](https://github.com/tmux-revamped/tmux-scroll-revamped/commit/daa4f701f820dc1b52b8cd265d0abf10e2efc419))
+
 ## [3.2.1](https://github.com/tmux-revamped/tmux-scroll-revamped/compare/v3.2.0...v3.2.1) (2026-11-18)
 
 
