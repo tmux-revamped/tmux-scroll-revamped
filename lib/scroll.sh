@@ -35,10 +35,14 @@ scroll_revamped_resolve() {
   '
 }
 
+scroll_revamped_setting_rows() {
+  scroll_revamped_setting_rows_format=$(scroll_revamped_format)
+  scroll_revamped_setting_rows_live=$(tmux display-message -p "${scroll_revamped_setting_rows_format}" 2>/dev/null) || scroll_revamped_setting_rows_live=""
+  scroll_revamped_resolve "${scroll_revamped_setting_rows_live}"
+}
+
 scroll_revamped_load() {
-  scroll_revamped_load_format=$(scroll_revamped_format)
-  scroll_revamped_load_live=$(tmux display-message -p "${scroll_revamped_load_format}" 2>/dev/null) || scroll_revamped_load_live=""
-  scroll_revamped_load_values=$(scroll_revamped_resolve "${scroll_revamped_load_live}")
+  scroll_revamped_load_values=$(scroll_revamped_setting_rows)
   while IFS='	' read -r scroll_revamped_load_name scroll_revamped_load_value; do
     IFS= read -r "SCROLL_REVAMPED_S_${scroll_revamped_load_name}" <<EOF
 ${scroll_revamped_load_value}

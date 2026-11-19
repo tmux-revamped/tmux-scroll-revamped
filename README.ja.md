@@ -102,7 +102,7 @@ run-shell ~/.tmux/plugins/tmux-scroll-revamped/scroll-revamped.tmux
 | `@scroll_revamped_smooth` | `off` | `on` でコピーモードの 1 ティックを 5 ミリ秒間隔のステップに分け、20 行までは 1 行ずつスクロールするので、文字が跳ばずに滑ります。行単位で速度が 1000 未満のとき、tmux 3.2 以降 |
 | `@scroll_revamped_status_wheel` | `off` | `on` でステータスラインの上のホイールでウィンドウを切り替えます |
 
-どのオプションも、ダッシュ区切りのコマンドオプション（例 `--skip-empty on`）と環境変数（例 `SCROLL_REVAMPED_SKIP_EMPTY`）で指定できます。優先順位はコマンドライン、環境変数、tmux オプションの順です。空の tmux オプションは既定値を意味します。2 つの passthrough オプションをどちらも `off` にすると、ホイールは常にコピーモードに入ります。
+どのオプションも、ダッシュ区切りのコマンドオプション（例 `--skip-empty on`）と環境変数（例 `SCROLL_REVAMPED_SKIP_EMPTY`）で指定できます。優先順位はコマンドライン、環境変数、tmux オプションの順です。空の tmux オプションは既定値を意味します。`doctor` は、プラグインが認識できない値を持つ設定の名前を表示します。2 つの passthrough オプションをどちらも `off` にすると、ホイールは常にコピーモードに入ります。
 
 <a id="判断のしかた"></a>
 

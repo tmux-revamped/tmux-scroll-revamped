@@ -49,3 +49,18 @@ SCROLL_REVAMPED_TUNED=0
 SCROLL_REVAMPED_FIRST=""
 SCROLL_REVAMPED_TOOL=""
 REVAMPED_LOG_NS=scroll-revamped
+SCROLL_REVAMPED_KINDS='mouse	on off
+wheel	on off
+passthrough_alternate	on off
+passthrough_mouse	on off
+skip_empty	on off
+select_pane	on off
+auto_exit	on off
+indicator	on off
+drag_copy	on off
+click_copy	on off
+smooth	on off
+status_wheel	on off
+alt_keys	arrow page
+speed	number 1
+granularity	line halfpage page'

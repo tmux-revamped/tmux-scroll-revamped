@@ -127,9 +127,16 @@ scroll_revamped_doctor_clipboard() {
   revamped_doctor_line clipboard warn "drag and click copy need pbcopy, wl-copy, xclip or xsel"
 }
 
+scroll_revamped_doctor_settings() {
+  scroll_revamped_doctor_settings_rows=$(scroll_revamped_setting_rows)
+  # shellcheck disable=SC2154
+  revamped_doctor_settings "${SCROLL_REVAMPED_KINDS}" "${scroll_revamped_doctor_settings_rows}"
+}
+
 scroll_revamped_doctor() {
   revamped_doctor_tmux
   scroll_revamped_doctor_clipboard
+  scroll_revamped_doctor_settings
   revamped_doctor_gum
   revamped_doctor_core_tools awk sed tr
   revamped_doctor_finish

@@ -92,6 +92,18 @@ answers() {
   grep -q '^format --theme pink' "${REVAMPED_TEST_GUM_LOG}"
 }
 
+@test "cli - doctor names a setting whose value it does not know" {
+  # Arrange
+  export REVAMPED_TEST_TMUX_VERSION=3.6 SCROLL_REVAMPED_GRANULARITY=pages
+
+  # Act
+  tool doctor
+
+  # Assert
+  run grep '^settings' <<<"${output}"
+  [[ "${output}" == "settings           warn     unknown values: granularity=pages" ]]
+}
+
 @test "cli - doctor lists every tool and exits 0" {
   # Arrange
   export REVAMPED_TEST_TMUX_VERSION=3.6

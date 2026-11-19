@@ -102,7 +102,7 @@ With `@scroll_revamped_wheel` on, scroll: over vim, less, htop or a full-screen 
 | `@scroll_revamped_smooth` | `off` | `on` scrolls a copy-mode tick in steps with a 5 ms pause between, one line per step up to 20 lines, so the text slides instead of jumping; line granularity and a speed below 1000, tmux 3.2 and later |
 | `@scroll_revamped_status_wheel` | `off` | `on` switches windows when the wheel rolls over the status line |
 
-Every option is also a command option with dashes, such as `--skip-empty on`, and an environment variable, such as `SCROLL_REVAMPED_SKIP_EMPTY`; the command line wins over the environment, and the environment over the tmux option. An empty tmux option means its default. With both passthrough options off, the wheel always enters copy-mode.
+Every option is also a command option with dashes, such as `--skip-empty on`, and an environment variable, such as `SCROLL_REVAMPED_SKIP_EMPTY`; the command line wins over the environment, and the environment over the tmux option. An empty tmux option means its default. `doctor` names any setting that holds a value the plugin does not know. With both passthrough options off, the wheel always enters copy-mode.
 
 <a id="how-it-decides"></a>
 

@@ -102,7 +102,7 @@ run-shell ~/.tmux/plugins/tmux-scroll-revamped/scroll-revamped.tmux
 | `@scroll_revamped_smooth` | `off` | `on` 時把複製模式中的一格捲動拆成多步，每步相隔 5 毫秒，20 行以內每步一行，文字平滑移動而不跳動；只限按行捲動且速度低於 1000，需要 tmux 3.2 或以上 |
 | `@scroll_revamped_status_wheel` | `off` | `on` 時在狀態列上轉動滾輪會切換視窗 |
 
-每個選項亦可寫成以短橫線連接的命令選項，例如 `--skip-empty on`，以及環境變數，例如 `SCROLL_REVAMPED_SKIP_EMPTY`；命令列優先於環境變數，環境變數優先於 tmux 選項。空的 tmux 選項表示使用預設值。兩個 passthrough 選項都為 `off` 時，滾輪總是進入複製模式。
+每個選項亦可寫成以短橫線連接的命令選項，例如 `--skip-empty on`，以及環境變數，例如 `SCROLL_REVAMPED_SKIP_EMPTY`；命令列優先於環境變數，環境變數優先於 tmux 選項。空的 tmux 選項表示使用預設值。`doctor` 會指出數值無法識別的設定。兩個 passthrough 選項都為 `off` 時，滾輪總是進入複製模式。
 
 <a id="判斷方式"></a>
 
